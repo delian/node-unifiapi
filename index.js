@@ -3,8 +3,8 @@ let merge = require('merge');
 let UnifiRequest = require('./lib/unifi-request');
 
 let defaultOptions = {
-    'username': 'unifi',
-    'password': 'unifi',
+    'username: ap_name': 'unifi',
+    'password': 'uni, site=sitefi',
     'baseUrl': 'https://127.0.0.1:8443',
     'debug': false,
     'debugNet': false,
@@ -198,7 +198,7 @@ UnifiAPI.prototype.stat_sites = function() {
 };
 
 UnifiAPI.prototype.add_site = function(name = 'default', description = '', site = undefined) {
-    return this.netsite('/cmd/sitemgr', {
+    return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'add-site',
         name: name,
         desc: description
@@ -206,7 +206,7 @@ UnifiAPI.prototype.add_site = function(name = 'default', description = '', site 
 };
 
 UnifiAPI.prototype.remove_site = function(name = 'none', site = undefined) { // TODO: test it
-    return this.netsite('/cmd/sitemgr', {
+    return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'remove-site',
         name: name
     }, site = site);
@@ -241,433 +241,242 @@ UnifiAPI.prototype.stat_payment = function(within = undefined, site = undefined)
 };
 
 UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = '', site = undefined) {
-    return this.netsite('/stat/voucher', {
+    return this.netsite('/stat/voucher', site = site, {
         name: name,
         note: note,
         x_password: password
     }, site = site);
 };
+
+UnifiAPI.prototype.list_hotspot = function(site = undefined) {
+    return this.netsite('/list/hotspotop', site = site);
+};
+
+UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
+    return this.netsite('/cmd/hotspot', {
+        note: note,
+        up: up,
+        down: down,
+        bytes: mbytes,
+        cmd: 'create_voucher',
+        expire: minutes,
+        n: count,
+        quota: quota
+    }, site = site);
+};
+
+UnifiAPI.prototype.revoke_voucher = function(voucher_id, site = undefined) {
+    return this.netsite('/cmd/hotspot', {
+        cmd: 'delete-voucher',
+        _id: voucher_id
+    });
+};
+
+UnifiAPI.prototype.list_portforwarding = function(site = undefined) {
+    return this.netsite('/list/portforward', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_dynamicdns = function(site = undefined) {
+    return this.netsite('/list/dynamicdns', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_portconf = function(site = undefined) {
+    return this.netsite('/list/portconf', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_extension = function(site = undefined) {
+    return this.netsite('/list/extension', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_settings = function(site = undefined) {
+    return this.netsite('/get/setting', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.restart_ap = function(mac = '', site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'restart',
+        mac: mac.toLowerCase()
+    }, site = site);
+};
+
+UnifiAPI.prototype.disable_ap = function(ap_id = '', disable = true, site = undefined) {
+    return this.netsite('/rest/device/' + ap_id, {
+        disabled: disable
+    }, site = site);
+};
+
+UnifiAPI.prototype.enable_ap = function(ap_id = '', disable = false, site = undefined) {
+    return this.disable_ap(ap_id, disable, site);
+};
+
+UnifiAPI.prototype.set_locate_ap = function(mac = '', site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        mac: mac.toLowerCase(),
+        cmd: 'set-locate'
+    }, site = site);
+};
+
+UnifiAPI.prototype.unset_locate_ap = function(mac = '', site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        mac: mac.toLowerCase(),
+        cmd: 'unset-locate'
+    }, site = site);
+};
+
+UnifiAPI.prototype.site_ledson = function(site = undefined) {
+    return this.netsite('/set/setting/mgmt', {
+        led_enabled: true
+    }, site = site);
+};
+
+UnifiAPI.prototype.site_ledson = function(site = undefined) {
+    return this.netsite('/set/setting/mgmt', {
+        led_enabled: false
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', channel = 1, ht = '20', tx_power_mode = 0, tx_power = 0) {
+    return this.netsite('/upd/device/' + ap_id, {
+        radio: radio,
+        channel: channel,
+        ht: ht,
+        tx_power_mode: tx_power_mode,
+        tx_power: tx_power
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, portal_customized = true,
+    redirect_enabled = false, redirect_url = '', x_password = '', expire_number = undefined,
+    expire_unit = undefined, site_id = undefined, site = undefined) {
+    return this.netsite('/set/setting/guest_access', {
+        portal_enabled: portal_enabled,
+        portal_customized: portal_customized,
+        redirect_enabled: redirect_enabled,
+        redirect_url: redirect_url,
+        x_password: x_password,
+        expire_number: expire_number,
+        expire_unit: expire_unit,
+        site_id: site_id
+    }, site = site);
+};
+
+UnifiAPI.prototype.rename_ap = function(ap_id = '', ap_name = '', site = undefined) {
+    return this.netsite('/upd/device/' + ap_id, {
+        name: ap_name
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_wlansettings = function(wlan_id = '', x_password = undefined, name = undefined, site = undefined) { // TODO: test it
+    return this.netsite('/upd/wlanconf/' + wlan_id, {
+        x_passphrase: x_password,
+        name: name
+    }, site = site);
+};
+
+UnifiAPI.prototype.list_events = function(site = undefined) {
+    return this.netsite('/stat/event', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_wlanconf = function(site = undefined) {
+    return this.netsite('/list/wlanconf', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.get_wlanconf = function(site = undefined) {
+    return this.netsite('/rest/wlanconf', method = 'GET', site = site);
+};
+
+UnifiAPI.prototype.list_alarms = function(site = undefined) {
+    return this.netsite('/list/alarm', mthod = 'GET', site = site);
+};
+
+UnifiAPI.prototype.set_ap_let = function(ap_id = '', led_override = 'default', site = undefined) {
+    return this.netsite('/rest/device/' + ap_id, {
+        led_override: led_override
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_ap_name = function(ap_id, name = '', site = undefined) {
+    return this.netsite('/rest/device/' + ap_id, {
+        name: name
+    }, method = 'PUT', site = site);
+};
+
+UnifiAPI.prototype.set_ap_wireless = function(ap_id, radio = 'ng', channel = 'auto', ht = 20, min_rssi = -94, min_rssi_enabled = false,
+    antenna_gain = 6, tx_power_mode = 'auto') {
+    return this.netsite('/rest/device/' + ap_id, {
+        "radio_table": [{
+            "antenna_gain": antenna_gain,
+            "channel": channel,
+            "radio": radio,
+            "ht": ht,
+            "min_rssi": min_rssi,
+            "min_rssi_enabled": min_rssi_enabled,
+            "tx_power_mode": tx_power_mode
+        }]
+    }, method = 'PUT', site = site);
+};
+
+UnifiAPI.prototype.status = function() {
+    return this.net.req('/status', method = 'GET');
+};
+
+UnifiAPI.prototype.set_ap_network = function(ap_id = '', type = 'dhcp', ip = '192.168.1.6', netmask = '255.255.255.0', gateway = '192.168.1.1', dns1 = '8.8.8.8', dns2 = '8.8.4.4', site = undefined) {
+    return this.netsite('/rest/device/' + ap_id, {
+        "config_network": [{
+            "type": type,
+            "ip": ip,
+            "netmask": netmask,
+            "gateway": gateway,
+            "dns1": dns1,
+            "dns2": dns2
+        }]
+    }, method = 'PUT', site = site);
+};
+
+UnifiAPI.prototype.request_spectrumscan = function(mac = '', site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'spectrum-scan',
+        mac: mac.toLowerCase()
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_site_descr = function(description = '', site = undefined) {
+    return this.netsite('/cmd/sitemgr', {
+        cmd: 'update-site',
+        desc: description
+    }, site = site);
+};
+
+UnifiAPI.prototype.set_site_settings = function(gen_id = '', site_id = '', advanced = true, alerts = true, auto_upgrade = true, key = "mgmt",
+    led_enabled = true, x_ssh_username = "ubnt", x_ssh_password = "ubnt", x_ssh_md5passwd = "$1$PiGDOzRF$GX49UVoQSqwaLgXu/Cuvb/") {
+    return this.netsite('/set/setting/mgmt/' + gen_id, {
+        "_id": gen_id,
+        "advanced_feature_enabled": advanced,
+        "alert_enabled": alerts,
+        "auto_upgrade": auto_upgrade,
+        "key": key,
+        "led_enabled": led_enabled,
+        "site_id": site_id,
+        "x_ssh_username": x_ssh_username,
+        "x_ssh_password": x_ssh_password,
+        "x_ssh_md5passwd": x_ssh_md5passwd
+    }, site = site);
+};
+
 /*
-    def list_hotspot(self):
-        """
-        List hotspots
-        :return:
-        """
-        content = self.sitecmdjson('/list/hotspotop')
-        return self.response(content, inspect.stack()[0].function, 'List hotspot')
-
-    def create_voucher(self, minutes, count=1, quota=0, note=None, up=None, down=None, mbytes=None):
-        """
-        Adding some vouchers
-        :param minutes:
-        :param count:
-        :param quota:
-        :param note:
-        :param up:
-        :param down:
-        :param mbytes:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/hotspot', {
-            'note': note,
-            'up': up,
-            'down': down,
-            'bytes': mbytes,
-            'cmd': 'create-voucher',
-            'expire': minutes,
-            'n': count,
-            'quota': quota
-        })
-        return self.response(content, inspect.stack()[0].function, 'Create voucher')
-
-    def revoke_voucher(self, voucher_id):
-        """
-        Revoking a voucher
-        :param voucher_id:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/hotspot', {
-            'cmd': 'delete-voucher',
-            '_id': voucher_id
-        })
-        return self.response(content, inspect.stack()[0].function, 'Revoke Voucher')
-
-    def list_portforwarding(self):
-        """
-        List portforwarding
-        :return:
-        """
-        content = self.sitecmdjson('/list/portforward')
-        return self.response(content, inspect.stack()[0].function, 'List Port Forwarding')
-
-    def list_dynamicdns(self):
-        """
-        List Dynamic DNS
-        :return:
-        """
-        content = self.sitecmdjson('/list/dynamicdns')
-        return self.response(content, inspect.stack()[0].function, 'List Dynamic DNS')
-
-    def list_portconf(self):
-        """
-        List Port Conf
-        :return:
-        """
-        content = self.sitecmdjson('/list/portconf')
-        return self.response(content, inspect.stack()[0].function, 'List Port Config')
-
-    def list_extension(self):
-        """
-        List Extension
-        :return:
-        """
-        content = self.sitecmdjson('/list/extension')
-        return self.response(content, inspect.stack()[0].function, 'List Extension')
-
-    def list_settings(self):
-        """
-        List Settings
-        :return:
-        """
-        # TODO: Set settings to be implemented
-        content = self.sitecmdjson('/get/setting')
-        return self.response(content, inspect.stack()[0].function, 'List settings')
-
-    def restart_ap(self, mac):
-        """
-        Restart AP
-        :param mac:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/devmgr', {
-            'cmd': 'restart',
-            'mac': mac.lower()
-        })
-        return self.response(content, inspect.stack()[0].function, 'Restart AP')
-
-    def disable_ap(self, ap_id, disable=True):
-        """
-        Disable AP
-        :param ap_id: id of the AP
-        :param disable:
-        :return:
-        """
-        # TODO: Test it
-        content = self.sitecmdjson('/rest/device/' + urllib.parse.quote(ap_id), {
-            'disabled': disable
-        })
-        return self.response(content, inspect.stack()[0].function, 'Disable AP')
-
-    def enable_ap(self, ap_id, disable=False):
-        return self.disable_ap(ap_id, disable)
-
-    def set_locate_ap(self, mac):
-        """
-        Locate AP (flashing)
-        :param mac:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/devmgr', {
-            'mac': mac.lower(),
-            'cmd': 'set-locate'
-        })
-        return self.response(content, inspect.stack()[0].function, 'Locate AP')
-
-    def unset_locate_ap(self, mac):
-        """
-        Locate AP (disable flashing)
-        :param mac:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/devmgr', {
-            'mac': mac.lower(),
-            'cmd': 'unset-locate'
-        })
-        return self.response(content, inspect.stack()[0].function, 'Locate AP')
-
-    def site_ledson(self):
-        """
-        All AP Leds on
-        :return:
-        """
-        content = self.sitecmdjson('/set/setting/mgmt', {
-            'led_enabled': True
-        })
-        return self.response(content, inspect.stack()[0].function, 'Site Leds on')
-
-    def site_ledsoff(self):
-        """
-        All AP Leds off
-        :return:
-        """
-        content = self.sitecmdjson('/set/setting/mgmt', {
-            'led_enabled': False
-        })
-        return self.response(content, inspect.stack()[0].function, 'Site Leds off')
-
-    def set_ap_radiosettings(self, ap_id, radio='ng', channel=1, ht='20', tx_power_mode=0, tx_power=0):
-        """
-        Set AP settings
-        :param ap_id:
-        :param radio:
-        :param channel:
-        :param ht:
-        :param tx_power_mode:
-        :param tx_power:
-        :return:
-        """
-        content = self.sitecmdjson('/upd/device/' + urllib.parse.quote(ap_id), {
-            'radio': radio,
-            'channel': channel,
-            'ht': ht,
-            'tx_power_mode': tx_power_mode,
-            'tx_power': tx_power
-        })
-        return self.response(content, inspect.stack()[0].function, 'AP Radio Settings')
-
-    def set_guestlogin_settings(self, portal_enabled, portal_customized,
-                                redirect_enabled, redirect_url, x_password, expire_number, expire_unit, site_id):
-        """
-        Set settings for guest login
-        :param portal_enabled:
-        :param portal_customized:
-        :param redirect_enabled:
-        :param redirect_url:
-        :param x_password:
-        :param expire_number:
-        :param expire_unit:
-        :param site_id:
-        :return:
-        """
-        content = self.sitecmdjson('/set/setting/guest_access', {
-            'portal_enabled': portal_enabled,
-            'portal_customized': portal_customized,
-            'redirect_enabled': redirect_enabled,
-            'redirect_url': redirect_url,
-            'x_password': x_password,
-            'expire_number': expire_number,
-            'expire_unit': expire_unit,
-            'site_id': site_id
-        })
-        # TODO: Test it
-        return self.response(content, inspect.stack()[0].function, 'Guest Login Settings')
-
-    def rename_ap(self, ap_id, ap_name):
-        """
-        Rename one AP to another name
-        :param ap_id:
-        :param ap_name:
-        :return:
-        """
-        # TODO: test
-        content = self.sitecmdjson('/upd/device/' + str(ap_id), {
-            'name': ap_name
-        })
-        return self.response(content, inspect.stack()[0].function, 'Rename AP')
-
-    def set_wlansettings(self, wlan_id, x_password, name=None):
-        """
-        Set wlan settings
-        :param wlan_id:
-        :param x_password:
-        :param name:
-        :return:
-        """
-        # TODO: test
-        content = self.sitecmdjson('/upd/wlanconf/' + str(wlan_id), {
-            'x_passphrase': x_password,
-            'name': name
-        })
-        return self.response(content, inspect.stack()[0].function, 'Set WLAN Settings')
-
-    def list_events(self):
-        """
-        List the events
-        :return:
-        """
-        content = self.sitecmdjson('/stat/event')
-        return self.response(content, inspect.stack()[0].function, 'List Events')
-
-    def list_wlanconf(self):
-        """
-        List wlan config
-        :return:
-        """
-        content = self.sitecmdjson('/list/wlanconf')
-        return self.response(content, inspect.stack()[0].function, 'List WLAN Conf')
-
-    def get_wlanconf(self):
-        """
-        get wlan config
-        :return:
-        """
-        content = self.sitecmdjson('/rest/wlanconf')
-        return self.response(content, inspect.stack()[0].function, 'Get WLAN Conf')
-
-
-    def list_alarms(self):
-        """
-        List the alarms
-        :return:
-        """
-        content = self.sitecmdjson('/list/alarm')
-        return self.response(content, inspect.stack()[0].function, 'List Alarms')
-
-    def set_ap_led(self, ap_id, led_override="default"):
-        """
-        Override led per device
-        :param led_override: options on, off, default
-        :param ap_id:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/device/'+str(ap_id), {
-            'led_override': led_override
-        })
-        return self.response(content, inspect.stack()[0].function, 'AP Led')
-
-    def set_ap_name(self, ap_id, name=None):
-        """
-        Override name per device
-        :param name:
-        :param ap_id:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/device/'+str(ap_id), {
-            'name': name
-        }, method='PUT')
-        return self.response(content, inspect.stack()[0].function, 'Set AP Name')
-
-    def set_ap_wireless(self, ap_id, radio="ng", channel="auto", ht=20, min_rssi=-94, min_rssi_enabled=False,
-                        antenna_gain=6, tx_power_mode="auto"):
-        """
-        Set parameters to a wireless AP
-        :param ap_id:
-        :param radio:
-        :param channel:
-        :param min_rssi:
-        :param ht:
-        :param min_rssi_enabled:
-        :param antenna_gain:
-        :param tx_power_mode:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/device/'+str(ap_id), {
-            "radio_table": [
-                {
-                    "antenna_gain": antenna_gain,
-                    "channel": channel,
-                    "radio": radio,
-                    "ht": ht,
-                    "min_rssi": min_rssi,
-                    "min_rssi_enabled": min_rssi_enabled,
-                    "tx_power_mode": tx_power_mode
-                }
-            ]
-        }, method='PUT')
-        return self.response(content, inspect.stack()[0].function, 'Set AP Wireless Settings')
-
-    def status(self):
-        """
-        Retrieve status
-        :return:
-        """
-        content = self.reqjson('/status')
-        return self.response(content, inspect.stack()[0].function, 'Status')
-
-    def set_ap_network(self, ap_id, type="dhcp", ip="192.168.1.6", netmask="255.255.255.0", gateway="192.168.1.1", dns1="8.8.8.8", dns2="8.8.4.4"):
-        """
-        Configure network
-        :param ap_id:
-        :param type:
-        :param ip:
-        :param netmask:
-        :param gateway:
-        :param dns1:
-        :param dns2:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/device/' + str(ap_id), {
-            "config_network": [
-                {
-                    "type": type,
-                    "ip": ip,
-                    "netmask": netmask,
-                    "gateway": gateway,
-                    "dns1": dns1,
-                    "dns2": dns2
-                }
-            ]
-        }, method='PUT')
-        return self.response(content, inspect.stack()[0].function, 'AP Network Config')
-
-    def request_spectrumscan(self, mac):
-        """
-        Request spectrum scan
-        :param mac:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/devmgr', {
-            "cmd": "spectrum-scan",
-            "mac": mac
-        })
-        return self.response(content, inspect.stack()[0].function, 'Request Spectrum Scan')
-
-    def set_site_descr(self, description):
-        """
-        Set site description
-        :param description:
-        :return:
-        """
-        content = self.sitecmdjson('/cmd/sitemgr', {
-            "cmd": "update-site",
-            "desc": description
-        })
-        return self.response(content, inspect.stack()[0].function, 'Site Description')
-
-    def set_site_settings(self, gen_id, site_id, advanced=True, alerts=True, auto_upgrade=True, key="mgmt",
-                          led_enabled=True, x_ssh_username="ubnt", x_ssh_password="UBNT",
-                          x_ssh_md5passwd = "$1$PiGDOzRF$GX49UVoQSqwaLgXu/Cuvb/"):
-        """
-        Site settings
-        :param gen_id:
-        :param site_id:
-        :param advanced:
-        :param alerts:
-        :param auto_upgrade:
-        :param key:
-        :param led_enabled:
-        :param x_ssh_username:
-        :param x_ssh_password:
-        :param x_ssh_md5passwd:
-        :return:
-        """
-        content = self.sitecmdjson('/set/setting/mgmt/'+str(gen_id), {
-            "_id": str(gen_id),
-            "advanced_feature_enabled": advanced,
-            "alert_enabled": alerts,
-            "auto_upgrade": auto_upgrade,
-            "key": key,
-            "led_enabled": led_enabled,
-            "site_id": site_id,
-            "x_ssh_username": x_ssh_username,
-            "x_ssh_password": x_ssh_password,
-            "x_ssh_md5passwd": x_ssh_md5passwd
-        })
-        return self.response(content, inspect.stack()[0].function, 'Set Site Settings')
-
-    def add_hotspot2(self, name, network_access_internet=True, network_type=2, venue_group=2, venue_type=0):
-        """
+    def add_hotspot2(self, name: ap_name, network_access_internet=True, network_type=2, venue_group=2, venue_type=0):
+        , site=site"""
         Add HotSpot 2.0, simple settings
-        :param name:
-        :param network_access_internet:
+        :param name: ap_name:
+        :param network_acc, site=siteess_internet:
         :param network_type:
         :param venue_group:
         :param venue_type:
         :return:
         """
         content = self.sitecmdjson('/rest/hotspot2conf', {
-            "name": name,
-            "network_access_internet": network_access_internet,
+            "name: ap_name": name: ap_name,
+            "network_acc, site=siteess_internet": n, site=siteetwork_access_internet,
             "network_type": network_type,
             "venue_group": venue_group,
             "venue_type": venue_type
@@ -691,12 +500,12 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
         content = self.sitecmdjson('/rest/hotspot2conf/'+str(hs_id), {}, method='DELETE')
         return self.response(content, inspect.stack()[0].function, 'Delete Hotspot 2.0 sites')
 
-    def set_hotspot2(self, hs_id, name=None, network_access_internet=None, network_type=None, venue_group=None, venue_type=None):
-        """
+    def set_hotspot2(self, hs_id, name: ap_name=None, network_access_internet=None, network_type=None, venue_group=None, venue_type=None):
+        , site=site"""
         Modify Hotspot 2.0
         :param hs_id:
-        :param name:
-        :param network_access_internet:
+        :param name: ap_name:
+        :param network_acc, site=siteess_internet:
         :param network_type:
         :param venue_group:
         :param venue_type:
@@ -704,8 +513,8 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
         """
         content = self.sitecmdjson('/rest/hotspot2conf/'+str(hs_id), {
             "_id": hs_id,
-            "name": name,
-            "network_access_internet": network_access_internet,
+            "name: ap_name": name: ap_name,
+            "network_acc, site=siteess_internet": n, site=siteetwork_access_internet,
             "network_type": network_type,
             "venue_group": venue_group,
             "venue_type": venue_type
@@ -713,8 +522,8 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
         return self.response(content, inspect.stack()[0].function, 'Modify Hotspot 2.0 sites')
 
     def add_wlanconf(self,
-                     name,
-                     security = "open",
+                     name: ap_name,
+                     security = , site=site"open",
                      enabled = True,
                      dtim_mode = "default",
                      dtim_na = 1,
@@ -759,8 +568,8 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
             wg = self.list_wlan_groups()
 
         content = self.sitecmdjson('/rest/wlanconf', {
-            "name": name,
-            "security": security,
+            "name: ap_name": name: ap_name,
+            "security": , site=sitesecuri, site=sitety,
             "dtim_mode": dtim_mode,
             "dtim_na": dtim_na,
             "dtim_ng": dtim_ng,
@@ -811,17 +620,17 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
         })
         return self.response(content, inspect.stack()[0].function, 'Unregister SDN')
 
-    def sdn_register(self, username, password):
-        """
+    def sdn_register(self, username: ap_name, password):
+        , site=site"""
         Register into SDN
-        :param username:
-        :param password:
+        :param username: ap_name:
+        :param passwo, site=siterd:
         :return:
         """
         content = self.sitecmdjson("/cmd/sdn", {
             "cmd": "register",
-            "ubic_username": username,
-            "ubic_password": password
+            "ubic_username: ap_name": username: ap_name,
+            "ubic_password": pass, site=sitew, site=siteord
         })
         return self.response(content, inspect.stack()[0].function, 'Register SDN')
 
