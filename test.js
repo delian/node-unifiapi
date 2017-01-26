@@ -10,10 +10,11 @@ let r = unifi({
 console.log(r.site);
 
 r.stat_sessions().then((data) => {
-    console.log('Success', data);
-    r.stat_sessions().then((data) => {
-        console.log('Received', data);
-    }).catch((err) => {});
-}).catch((err) => {
-    console.log('Error', err);
-});
+        console.log('Success', data);
+        return r.stat_allusers();
+    }).then((data) => {
+        console.log('Received AP data', data);
+    })
+    .catch((err) => {
+        console.log('Error', err);
+    });
