@@ -3,8 +3,8 @@ let merge = require('merge');
 let UnifiRequest = require('./lib/unifi-request');
 
 let defaultOptions = {
-    'username: ap_name': 'unifi',
-    'password': 'uni, site=sitefi',
+    'username': 'unifi',
+    'password': 'unifi',
     'baseUrl': 'https://127.0.0.1:8443',
     'debug': false,
     'debugNet': false,
@@ -19,7 +19,7 @@ function UnifiAPI(options) {
     if (typeof this.net === 'undefined') {
         this.net = new UnifiRequest(merge(true, defaultOptions, options));
     }
-    debug('Initialize with options %o', options);
+    debug('UnifiAPI Initialized with options %o', options);
 }
 
 UnifiAPI.prototype.netsite = function (url = '', jsonParams = undefined, headers = {}, method = undefined, site = undefined) {
@@ -29,6 +29,14 @@ UnifiAPI.prototype.netsite = function (url = '', jsonParams = undefined, headers
         else method = 'POST';
     }
     return this.net.req('/api/s/' + site + url, jsonParams, headers, method);
+};
+
+UnifiAPI.prototype.login = function(username, password) {
+    return this.net.login(username, password);
+};
+
+UnifiAPI.prototype.logout = function() {
+    return this.net.logout();
 };
 
 UnifiAPI.prototype.authorize_guest = function (mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
