@@ -22,12 +22,16 @@ function UnifiAPI(options) {
     debug('Initialize with options %o', options);
 }
 
-UnifiAPI.prototype.netsite = function(url = '', jsonParams = undefined, headers = {}, method = 'POST', site = undefined) {
+UnifiAPI.prototype.netsite = function (url = '', jsonParams = undefined, headers = {}, method = undefined, site = undefined) {
     site = site || this.site;
+    if (typeof method === 'undefined') {
+        if (typeof jsonParams === 'undefined') method = 'GET';
+        else method = 'POST';
+    }
     return this.net.req('/api/s/' + site + url, jsonParams, headers, method);
 };
 
-UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
+UnifiAPI.prototype.authorize_guest = function (mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'authorize_guest',
         mac: mac.toLowerCase(),
@@ -39,48 +43,48 @@ UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undef
     }, site = site);
 };
 
-UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
+UnifiAPI.prototype.unauthorize_guest = function (mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'uauthorize_guest',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
+UnifiAPI.prototype.kick_sta = function (mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'kick_sta',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.block_sta = function(mac = '', site = undefined) {
+UnifiAPI.prototype.block_sta = function (mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'block-sta',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.unblock_sta = function(mac = '', site = undefined) {
+UnifiAPI.prototype.unblock_sta = function (mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'unblock-sta',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.set_sta_note = function(user = '', note = '', site = undefined) {
+UnifiAPI.prototype.set_sta_note = function (user = '', note = '', site = undefined) {
     return this.netsite('/upd/user/' + user, {
         note: note,
         noted: note ? true : false
     }, site = site);
 };
 
-UnifiAPI.prototype.set_sta_name = function(user = '', name = '', site = undefined) {
+UnifiAPI.prototype.set_sta_name = function (user = '', name = '', site = undefined) {
     return this.netsite('/upd/user/' + user, {
         name: name
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_sessions = function(start = undefined, end = undefined, site = undefined) {
+UnifiAPI.prototype.stat_sessions = function (start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/sessions', {
         type: 'all',
         start: start || (new Date()).getTime() / 1000 - 7 * 24 * 3600 * 1000,
@@ -88,7 +92,7 @@ UnifiAPI.prototype.stat_sessions = function(start = undefined, end = undefined, 
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined, site = undefined) {
+UnifiAPI.prototype.stat_daily_site = function (start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/daily.site', {
         start: start ? start : (new Date()).getTime() - 52 * 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -99,7 +103,7 @@ UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefined, site = undefined) {
+UnifiAPI.prototype.stat_hourly_site = function (start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/hourly.site', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -110,7 +114,7 @@ UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefine
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined, site = undefined) {
+UnifiAPI.prototype.stat_hourly_ap = function (start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/hourly.ap', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -120,7 +124,7 @@ UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined,
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_sta_sessions_latest = function(mac = '', limit = 5, sort = '-asoc-time', site = undefined) {
+UnifiAPI.prototype.stat_sta_sessions_latest = function (mac = '', limit = 5, sort = '-asoc-time', site = undefined) {
     return this.netsite('/stat/sessions', {
         mac: mac.toLowerCase(),
         '_limit': limit,
@@ -128,14 +132,14 @@ UnifiAPI.prototype.stat_sta_sessions_latest = function(mac = '', limit = 5, sort
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, site = undefined) {
+UnifiAPI.prototype.stat_auths = function (start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/authorization', {
         end: end || (new Date()).getTime(),
         start: start || (new Date()).getTime() - 7 * 24 * 3600000
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, site = undefined) {
+UnifiAPI.prototype.stat_allusers = function (historyhours = 8670, site = undefined) {
     return this.netsite('/stat/alluser', {
         type: 'all',
         conn: 'all',
@@ -143,61 +147,61 @@ UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, site = undefine
     }, site = site);
 };
 
-UnifiAPI.prototype.list_guests = function(historyhours = 8670, site = undefined) {
+UnifiAPI.prototype.list_guests = function (historyhours = 8670, site = undefined) {
     return this.netsite('/stat/guest', {
         within: historyhours
     }, site = site);
 };
 
-UnifiAPI.prototype.list_clients = function(mac = '', site = undefined) {
+UnifiAPI.prototype.list_clients = function (mac = '', site = undefined) {
     return this.netsite('/stat/sta/' + mac, site = site);
 };
 
-UnifiAPI.prototype.stat_client = function(mac = '', site = undefined) {
+UnifiAPI.prototype.stat_client = function (mac = '', site = undefined) {
     return this.netsite('/stat/user/' + mac, site = site);
 };
 
-UnifiAPI.prototype.list_usergroup = function(site = undefined) {
+UnifiAPI.prototype.list_usergroup = function (site = undefined) {
     return this.netsite('/list/usergroup', site = site);
 };
 
-UnifiAPI.prototype.set_usergroup = function(userid = '', groupid = '', site = undefined) {
+UnifiAPI.prototype.set_usergroup = function (userid = '', groupid = '', site = undefined) {
     return this.netsite('/upd/user/' + userid, {
         usergroup_id: groupid
     }, site = site);
 };
 
-UnifiAPI.prototype.list_health = function(site = undefined) {
+UnifiAPI.prototype.list_health = function (site = undefined) {
     return this.netsite('/stat/health', site = site);
 };
 
-UnifiAPI.prototype.list_dashboard = function(site = undefined) {
+UnifiAPI.prototype.list_dashboard = function (site = undefined) {
     return this.netsite('/stat/dashboard', site = site);
 };
 
-UnifiAPI.prototype.list_users = function(site = undefined) {
+UnifiAPI.prototype.list_users = function (site = undefined) {
     return this.netsite('/list/user', site = site);
 };
 
-UnifiAPI.prototype.list_aps = function(site = undefined) { // TODO: not working with mac different than none
+UnifiAPI.prototype.list_aps = function (site = undefined) { // TODO: not working with mac different than none
     return this.netsite('/stat/device/' + mac, site = site);
 };
 
-UnifiAPI.prototype.list_rogueaps = function(within = 24, site = undefined) {
+UnifiAPI.prototype.list_rogueaps = function (within = 24, site = undefined) {
     return this.netsite('/stat/rogueap', {
         within: within
     }, site = site);
 };
 
-UnifiAPI.prototype.list_sites = function() {
+UnifiAPI.prototype.list_sites = function () {
     return this.net.req('/api/self/sites');
 };
 
-UnifiAPI.prototype.stat_sites = function() {
+UnifiAPI.prototype.stat_sites = function () {
     return this.net.req('/api/stat/sites');
 };
 
-UnifiAPI.prototype.add_site = function(name = 'default', description = '', site = undefined) {
+UnifiAPI.prototype.add_site = function (name = 'default', description = '', site = undefined) {
     return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'add-site',
         name: name,
@@ -205,42 +209,42 @@ UnifiAPI.prototype.add_site = function(name = 'default', description = '', site 
     }, site = site);
 };
 
-UnifiAPI.prototype.remove_site = function(name = 'none', site = undefined) { // TODO: test it
+UnifiAPI.prototype.remove_site = function (name = 'none', site = undefined) { // TODO: test it
     return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'remove-site',
         name: name
     }, site = site);
 };
 
-UnifiAPI.prototype.list_wlan_groups = function(site = undefined) {
+UnifiAPI.prototype.list_wlan_groups = function (site = undefined) {
     return this.netsite('/list/wlangroup', site = site);
 };
 
-UnifiAPI.prototype.stat_sysinfo = function(site = undefined) {
+UnifiAPI.prototype.stat_sysinfo = function (site = undefined) {
     return this.netsite('/stat/sysinfo', site = site);
 };
 
-UnifiAPI.prototype.list_self = function(site = undefined) { // TODO: test
+UnifiAPI.prototype.list_self = function (site = undefined) { // TODO: test
     return this.netsite('/self', site = site);
 };
 
-UnifiAPI.prototype.list_networkconf = function(site = undefined) {
+UnifiAPI.prototype.list_networkconf = function (site = undefined) {
     return this.netsite('/list/networkconf', site = site);
 };
 
-UnifiAPI.prototype.stat_voucher = function(createtime = undefined, site = undefined) {
+UnifiAPI.prototype.stat_voucher = function (createtime = undefined, site = undefined) {
     return this.netsite('/stat/voucher', {
         create_time: createtime
     }, site = site);
 };
 
-UnifiAPI.prototype.stat_payment = function(within = undefined, site = undefined) {
+UnifiAPI.prototype.stat_payment = function (within = undefined, site = undefined) {
     return this.netsite('/stat/payment', { // TODO: test it, is it payment or voucher
         within: within
     }, site = site);
 };
 
-UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = '', site = undefined) {
+UnifiAPI.prototype.create_hotspot = function (name = '', password = '', note = '', site = undefined) {
     return this.netsite('/stat/voucher', site = site, {
         name: name,
         note: note,
@@ -248,11 +252,11 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
     }, site = site);
 };
 
-UnifiAPI.prototype.list_hotspot = function(site = undefined) {
+UnifiAPI.prototype.list_hotspot = function (site = undefined) {
     return this.netsite('/list/hotspotop', site = site);
 };
 
-UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
+UnifiAPI.prototype.create_voucher = function (minutes = 60, count = 1, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
     return this.netsite('/cmd/hotspot', {
         note: note,
         up: up,
@@ -265,77 +269,77 @@ UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0,
     }, site = site);
 };
 
-UnifiAPI.prototype.revoke_voucher = function(voucher_id, site = undefined) {
+UnifiAPI.prototype.revoke_voucher = function (voucher_id, site = undefined) {
     return this.netsite('/cmd/hotspot', {
         cmd: 'delete-voucher',
         _id: voucher_id
     });
 };
 
-UnifiAPI.prototype.list_portforwarding = function(site = undefined) {
+UnifiAPI.prototype.list_portforwarding = function (site = undefined) {
     return this.netsite('/list/portforward', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_dynamicdns = function(site = undefined) {
+UnifiAPI.prototype.list_dynamicdns = function (site = undefined) {
     return this.netsite('/list/dynamicdns', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_portconf = function(site = undefined) {
+UnifiAPI.prototype.list_portconf = function (site = undefined) {
     return this.netsite('/list/portconf', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_extension = function(site = undefined) {
+UnifiAPI.prototype.list_extension = function (site = undefined) {
     return this.netsite('/list/extension', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_settings = function(site = undefined) {
+UnifiAPI.prototype.list_settings = function (site = undefined) {
     return this.netsite('/get/setting', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.restart_ap = function(mac = '', site = undefined) {
+UnifiAPI.prototype.restart_ap = function (mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         cmd: 'restart',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.disable_ap = function(ap_id = '', disable = true, site = undefined) {
+UnifiAPI.prototype.disable_ap = function (ap_id = '', disable = true, site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         disabled: disable
     }, site = site);
 };
 
-UnifiAPI.prototype.enable_ap = function(ap_id = '', disable = false, site = undefined) {
+UnifiAPI.prototype.enable_ap = function (ap_id = '', disable = false, site = undefined) {
     return this.disable_ap(ap_id, disable, site);
 };
 
-UnifiAPI.prototype.set_locate_ap = function(mac = '', site = undefined) {
+UnifiAPI.prototype.set_locate_ap = function (mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         mac: mac.toLowerCase(),
         cmd: 'set-locate'
     }, site = site);
 };
 
-UnifiAPI.prototype.unset_locate_ap = function(mac = '', site = undefined) {
+UnifiAPI.prototype.unset_locate_ap = function (mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         mac: mac.toLowerCase(),
         cmd: 'unset-locate'
     }, site = site);
 };
 
-UnifiAPI.prototype.site_ledson = function(site = undefined) {
+UnifiAPI.prototype.site_ledson = function (site = undefined) {
     return this.netsite('/set/setting/mgmt', {
         led_enabled: true
     }, site = site);
 };
 
-UnifiAPI.prototype.site_ledson = function(site = undefined) {
+UnifiAPI.prototype.site_ledson = function (site = undefined) {
     return this.netsite('/set/setting/mgmt', {
         led_enabled: false
     }, site = site);
 };
 
-UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', channel = 1, ht = '20', tx_power_mode = 0, tx_power = 0) {
+UnifiAPI.prototype.set_ap_radiosettings = function (ap_id = '', radio = 'ng', channel = 1, ht = '20', tx_power_mode = 0, tx_power = 0) {
     return this.netsite('/upd/device/' + ap_id, {
         radio: radio,
         channel: channel,
@@ -345,7 +349,7 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
     }, site = site);
 };
 
-UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, portal_customized = true,
+UnifiAPI.prototype.set_guestlogin_settings = function (portal_enabled = true, portal_customized = true,
     redirect_enabled = false, redirect_url = '', x_password = '', expire_number = undefined,
     expire_unit = undefined, site_id = undefined, site = undefined) {
     return this.netsite('/set/setting/guest_access', {
@@ -360,48 +364,48 @@ UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, por
     }, site = site);
 };
 
-UnifiAPI.prototype.rename_ap = function(ap_id = '', ap_name = '', site = undefined) {
+UnifiAPI.prototype.rename_ap = function (ap_id = '', ap_name = '', site = undefined) {
     return this.netsite('/upd/device/' + ap_id, {
         name: ap_name
     }, site = site);
 };
 
-UnifiAPI.prototype.set_wlansettings = function(wlan_id = '', x_password = undefined, name = undefined, site = undefined) { // TODO: test it
+UnifiAPI.prototype.set_wlansettings = function (wlan_id = '', x_password = undefined, name = undefined, site = undefined) { // TODO: test it
     return this.netsite('/upd/wlanconf/' + wlan_id, {
         x_passphrase: x_password,
         name: name
     }, site = site);
 };
 
-UnifiAPI.prototype.list_events = function(site = undefined) {
+UnifiAPI.prototype.list_events = function (site = undefined) {
     return this.netsite('/stat/event', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_wlanconf = function(site = undefined) {
+UnifiAPI.prototype.list_wlanconf = function (site = undefined) {
     return this.netsite('/list/wlanconf', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.get_wlanconf = function(site = undefined) {
+UnifiAPI.prototype.get_wlanconf = function (site = undefined) {
     return this.netsite('/rest/wlanconf', method = 'GET', site = site);
 };
 
-UnifiAPI.prototype.list_alarms = function(site = undefined) {
+UnifiAPI.prototype.list_alarms = function (site = undefined) {
     return this.netsite('/list/alarm', mthod = 'GET', site = site);
 };
 
-UnifiAPI.prototype.set_ap_let = function(ap_id = '', led_override = 'default', site = undefined) {
+UnifiAPI.prototype.set_ap_let = function (ap_id = '', led_override = 'default', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         led_override: led_override
     }, site = site);
 };
 
-UnifiAPI.prototype.set_ap_name = function(ap_id, name = '', site = undefined) {
+UnifiAPI.prototype.set_ap_name = function (ap_id, name = '', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         name: name
     }, method = 'PUT', site = site);
 };
 
-UnifiAPI.prototype.set_ap_wireless = function(ap_id, radio = 'ng', channel = 'auto', ht = 20, min_rssi = -94, min_rssi_enabled = false,
+UnifiAPI.prototype.set_ap_wireless = function (ap_id, radio = 'ng', channel = 'auto', ht = 20, min_rssi = -94, min_rssi_enabled = false,
     antenna_gain = 6, tx_power_mode = 'auto') {
     return this.netsite('/rest/device/' + ap_id, {
         "radio_table": [{
@@ -416,11 +420,11 @@ UnifiAPI.prototype.set_ap_wireless = function(ap_id, radio = 'ng', channel = 'au
     }, method = 'PUT', site = site);
 };
 
-UnifiAPI.prototype.status = function() {
+UnifiAPI.prototype.status = function () {
     return this.net.req('/status', method = 'GET');
 };
 
-UnifiAPI.prototype.set_ap_network = function(ap_id = '', type = 'dhcp', ip = '192.168.1.6', netmask = '255.255.255.0', gateway = '192.168.1.1', dns1 = '8.8.8.8', dns2 = '8.8.4.4', site = undefined) {
+UnifiAPI.prototype.set_ap_network = function (ap_id = '', type = 'dhcp', ip = '192.168.1.6', netmask = '255.255.255.0', gateway = '192.168.1.1', dns1 = '8.8.8.8', dns2 = '8.8.4.4', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         "config_network": [{
             "type": type,
@@ -433,22 +437,22 @@ UnifiAPI.prototype.set_ap_network = function(ap_id = '', type = 'dhcp', ip = '19
     }, method = 'PUT', site = site);
 };
 
-UnifiAPI.prototype.request_spectrumscan = function(mac = '', site = undefined) {
+UnifiAPI.prototype.request_spectrumscan = function (mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         cmd: 'spectrum-scan',
         mac: mac.toLowerCase()
     }, site = site);
 };
 
-UnifiAPI.prototype.set_site_descr = function(description = '', site = undefined) {
+UnifiAPI.prototype.set_site_descr = function (description = '', site = undefined) {
     return this.netsite('/cmd/sitemgr', {
         cmd: 'update-site',
         desc: description
     }, site = site);
 };
 
-UnifiAPI.prototype.set_site_settings = function(gen_id = '', site_id = '', advanced = true, alerts = true, auto_upgrade = true, key = "mgmt",
-    led_enabled = true, x_ssh_username = "ubnt", x_ssh_password = "ubnt", x_ssh_md5passwd = "$1$PiGDOzRF$GX49UVoQSqwaLgXu/Cuvb/") {
+UnifiAPI.prototype.set_site_settings = function (gen_id = '', site_id = '', advanced = true, alerts = true, auto_upgrade = true, key = "mgmt",
+    led_enabled = true, x_ssh_username = "ubnt", x_ssh_password = "ubnt", x_ssh_md5passwd = "$1$PiGDOzRF$GX49UVoQSqwaLgXu/Cuvb/", site = undefined) {
     return this.netsite('/set/setting/mgmt/' + gen_id, {
         "_id": gen_id,
         "advanced_feature_enabled": advanced,
@@ -463,196 +467,115 @@ UnifiAPI.prototype.set_site_settings = function(gen_id = '', site_id = '', advan
     }, site = site);
 };
 
-/*
-    def add_hotspot2(self, name: ap_name, network_access_internet=True, network_type=2, venue_group=2, venue_type=0):
-        , site=site"""
-        Add HotSpot 2.0, simple settings
-        :param name: ap_name:
-        :param network_acc, site=siteess_internet:
-        :param network_type:
-        :param venue_group:
-        :param venue_type:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/hotspot2conf', {
-            "name: ap_name": name: ap_name,
-            "network_acc, site=siteess_internet": n, site=siteetwork_access_internet,
-            "network_type": network_type,
-            "venue_group": venue_group,
-            "venue_type": venue_type
-        })
-        return self.response(content, inspect.stack()[0].function, 'Add Hotspot 2.0')
+UnifiAPI.prototype.add_hotspot2 = function (name = 'hotspot', network_access_internet = undefined, network_type = 2,
+    venue_group = 2, venue_type = 0, site = undefined) {
+    return this.netsite('/rest/hotspot2conf', {
+        name: name,
+        network_access_internet: network_access_internet,
+        network_type: network_type,
+        venue_group: venue_group,
+        venue_type: venue_type
+    }, site = site);
+};
 
-    def list_hotspot2(self):
-        """
-        List the hotspot2.0 sites
-        :return:
-        """
-        content = self.sitecmdjson('/rest/hotspot2conf')
-        return self.response(content, inspect.stack()[0].function, 'List Hotspot 2.0 sites')
+UnifiAPI.prototype.list_hotspot2 = function (site = undefined) {
+    return this.netsite('/rest/hotspot2conf', method = 'GET', site = site);
+};
 
-    def delete_hotspot2(self, hs_id):
-        """
-        Delete hotspot 2.0
-        :param hs_id:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/hotspot2conf/'+str(hs_id), {}, method='DELETE')
-        return self.response(content, inspect.stack()[0].function, 'Delete Hotspot 2.0 sites')
+UnifiAPI.prototype.delete_hotspot2 = function (hs_id, site = undefined) {
+    return this.netsite('/rest/hotspot2conf/' + hs_id, method = 'DELETE', site = site);
+};
 
-    def set_hotspot2(self, hs_id, name: ap_name=None, network_access_internet=None, network_type=None, venue_group=None, venue_type=None):
-        , site=site"""
-        Modify Hotspot 2.0
-        :param hs_id:
-        :param name: ap_name:
-        :param network_acc, site=siteess_internet:
-        :param network_type:
-        :param venue_group:
-        :param venue_type:
-        :return:
-        """
-        content = self.sitecmdjson('/rest/hotspot2conf/'+str(hs_id), {
-            "_id": hs_id,
-            "name: ap_name": name: ap_name,
-            "network_acc, site=siteess_internet": n, site=siteetwork_access_internet,
-            "network_type": network_type,
-            "venue_group": venue_group,
-            "venue_type": venue_type
-        }, method="PUT")
-        return self.response(content, inspect.stack()[0].function, 'Modify Hotspot 2.0 sites')
+UnifiAPI.prototype.set_hotspot2 = function (hs_id = '', name = undefined, network_access_internet = undefined,
+    network_type = undefined, venue_type = undefined, venue_group = undefined, site = undefined) {
+    return this.netsite('/rest/hotspot2conf/' + hs_id, {
+        name: name,
+        network_access_internet: network_access_internet,
+        _id: hs_id,
+        network_type: network_type,
+        venue_type: venue_type,
+        venue_group: venue_group
+    }, method = 'PUT', site = site);
+};
 
-    def add_wlanconf(self,
-                     name: ap_name,
-                     security = , site=site"open",
-                     enabled = True,
-                     dtim_mode = "default",
-                     dtim_na = 1,
-                     dtim_ng = 1,
-                     mac_filter_enabled = False,
-                     mac_filter_list = [],
-                     mac_filter_policy = "deny",
-                     radius_port_1 = 1812,
-                     schedule = [],
-                     schedule_enabled = False,
-                     usergroup_id = None,
-                     wlangroup_id = None,
-                     usergroup = "Default",
-                     wlangroup = "Default",
-                     wep_idx = 1,
-                     wpa_enc = "ccmp",
-                     wpa_mode = "wpa2",
-                     ratectrl_na_6 = "basic",
-                     ratectrl_na_9 = "supported",
-                     ratectrl_na_12 = "basic",
-                     ratectrl_na_18 = "supported",
-                     ratectrl_na_24 = "basic",
-                     ratectrl_na_36 = "supported",
-                     ratectrl_na_48 = "supported",
-                     ratectrl_na_54 = "supported",
-                     ratectrl_na_mode = "default",
-                     ratectrl_ng_6 = "basic",
-                     ratectrl_ng_9 = "supported",
-                     ratectrl_ng_12 = "basic",
-                     ratectrl_ng_18 = "supported",
-                     ratectrl_ng_24 = "basic",
-                     ratectrl_ng_36 = "supported",
-                     ratectrl_ng_48 = "supported",
-                     ratectrl_ng_54 = "supported",
-                     ratectrl_ng_cck_1 = "disabled",
-                     ratectrl_ng_cck_2 = "disabled",
-                     ratectrl_ng_cck_5_5 = "disabled",
-                     ratectrl_ng_cck_11 = "disabled",
-                     ratectrl_ng_mode = "default"
-                     ):
-        if not wlangroup_id:
-            wg = self.list_wlan_groups()
+UnifiAPI.prototype.add_wlanconf = function (name, security = 'open', enabled = true, dtim_mode = 'default',
+    dtim_na = 1, dtim_ng = 1, mac_filter_enabled = false, mac_filter_list = [], mac_filter_policy = 'deny',
+    radius_port_1 = 1812, schedule = [], schedule_enabled = false, usergroup_id = undefined, wlangroup_id = undefined,
+    usergroup = 'Default', wlangroup = 'Default', wep_idx = 1, wpa_enc = 'ccmp', wpa_mode = 'wpa2',
+    ratectrl_na_6 = "basic", ratectrl_na_9 = "supported", ratectrl_na_12 = "basic", ratectrl_na_18 = "supported",
+    ratectrl_na_24 = "basic", ratectrl_na_36 = "supported", ratectrl_na_48 = "supported", ratectrl_na_54 = "supported",
+    ratectrl_na_mode = "default", ratectrl_ng_6 = "basic", ratectrl_ng_9 = "supported", ratectrl_ng_12 = "basic",
+    ratectrl_ng_18 = "supported", ratectrl_ng_24 = "basic", ratectrl_ng_36 = "supported", ratectrl_ng_48 = "supported",
+    ratectrl_ng_54 = "supported", ratectrl_ng_cck_1 = "disabled", ratectrl_ng_cck_2 = "disabled", ratectrl_ng_cck_5_5 = "disabled",
+    ratectrl_ng_cck_11 = "disabled", ratectrl_ng_mode = "default", site = undefined
+) {
+    return this.netsite('/rest/wlanconf', {
+        "name": name,
+        "security": security,
+        "dtim_mode": dtim_mode,
+        "dtim_na": dtim_na,
+        "dtim_ng": dtim_ng,
+        "enabled": enabled,
+        "mac_filter_enabled": mac_filter_enabled,
+        "mac_filter_list": mac_filter_list,
+        "mac_filter_policy": mac_filter_policy,
+        "radius_port_1": radius_port_1,
+        "schedule": schedule,
+        "schedule_enabled": schedule_enabled,
+        "usergroup_id": usergroup_id,
+        "wlangroup_id": wlangroup_id,
+        "wep_idx": wep_idx,
+        "wpa_enc": wpa_enc,
+        "wpa_mode": wpa_mode,
+        "ratectrl_na_6": ratectrl_na_6,
+        "ratectrl_na_9": ratectrl_na_9,
+        "ratectrl_na_12": ratectrl_na_12,
+        "ratectrl_na_18": ratectrl_na_18,
+        "ratectrl_na_24": ratectrl_na_24,
+        "ratectrl_na_36": ratectrl_na_36,
+        "ratectrl_na_48": ratectrl_na_48,
+        "ratectrl_na_54": ratectrl_na_54,
+        "ratectrl_na_mode": ratectrl_na_mode,
+        "ratectrl_ng_6": ratectrl_ng_6,
+        "ratectrl_ng_9": ratectrl_ng_9,
+        "ratectrl_ng_12": ratectrl_ng_12,
+        "ratectrl_ng_18": ratectrl_ng_18,
+        "ratectrl_ng_24": ratectrl_ng_24,
+        "ratectrl_ng_36": ratectrl_ng_36,
+        "ratectrl_ng_48": ratectrl_ng_48,
+        "ratectrl_ng_54": ratectrl_ng_54,
+        "ratectrl_ng_cck_1": ratectrl_ng_cck_1,
+        "ratectrl_ng_cck_2": ratectrl_ng_cck_2,
+        "ratectrl_ng_cck_5_5": ratectrl_ng_cck_5_5,
+        "ratectrl_ng_cck_11": ratectrl_ng_cck_11,
+        "ratectrl_ng_mode": ratectrl_ng_mode
+    }, site = site);
+};
 
-        content = self.sitecmdjson('/rest/wlanconf', {
-            "name: ap_name": name: ap_name,
-            "security": , site=sitesecuri, site=sitety,
-            "dtim_mode": dtim_mode,
-            "dtim_na": dtim_na,
-            "dtim_ng": dtim_ng,
-            "enabled": enabled,
-            "mac_filter_enabled": mac_filter_enabled,
-            "mac_filter_list": mac_filter_list,
-            "mac_filter_policy": mac_filter_policy,
-            "radius_port_1": radius_port_1,
-            "schedule": schedule,
-            "schedule_enabled": schedule_enabled,
-            "usergroup_id": usergroup_id,
-            "wlangroup_id": wlangroup_id,
-            "wep_idx": wep_idx,
-            "wpa_enc": wpa_enc,
-            "wpa_mode": wpa_mode,
-            "ratectrl_na_6": ratectrl_na_6,
-            "ratectrl_na_9": ratectrl_na_9,
-            "ratectrl_na_12": ratectrl_na_12,
-            "ratectrl_na_18": ratectrl_na_18,
-            "ratectrl_na_24": ratectrl_na_24,
-            "ratectrl_na_36": ratectrl_na_36,
-            "ratectrl_na_48": ratectrl_na_48,
-            "ratectrl_na_54": ratectrl_na_54,
-            "ratectrl_na_mode": ratectrl_na_mode,
-            "ratectrl_ng_6": ratectrl_ng_6,
-            "ratectrl_ng_9": ratectrl_ng_9,
-            "ratectrl_ng_12": ratectrl_ng_12,
-            "ratectrl_ng_18": ratectrl_ng_18,
-            "ratectrl_ng_24": ratectrl_ng_24,
-            "ratectrl_ng_36": ratectrl_ng_36,
-            "ratectrl_ng_48": ratectrl_ng_48,
-            "ratectrl_ng_54": ratectrl_ng_54,
-            "ratectrl_ng_cck_1": ratectrl_ng_cck_1,
-            "ratectrl_ng_cck_2": ratectrl_ng_cck_2,
-            "ratectrl_ng_cck_5_5": ratectrl_ng_cck_5_5,
-            "ratectrl_ng_cck_11": ratectrl_ng_cck_11,
-            "ratectrl_ng_mode": ratectrl_ng_mode
-        })
-        return self.response(content, inspect.stack()[0].function, 'Modify WlanConf')
+UnifiAPI.prototype.sdn_unregister = function (site = undefined) {
+    return this.netsite('/cmd/sdn', {
+        cmd: 'register',
+        ubic_username: username,
+        ubic_password: password
+    }, site = site);
+};
 
-    def sdn_unregister(self):
-        """
-        Disable and remove cloud access
-        :return:
-        """
-        content = self.sitecmdjson("/cmd/sdn", {
-            "cmd": "unregister"
-        })
-        return self.response(content, inspect.stack()[0].function, 'Unregister SDN')
+UnifiAPI.prototype.sdn_register = function (username, password, site = undefined) {
+    return this.netsite('/cmd/sdn', {
+        cmd: 'unregister'
+    }, site = site);
+};
 
-    def sdn_register(self, username: ap_name, password):
-        , site=site"""
-        Register into SDN
-        :param username: ap_name:
-        :param passwo, site=siterd:
-        :return:
-        """
-        content = self.sitecmdjson("/cmd/sdn", {
-            "cmd": "register",
-            "ubic_username: ap_name": username: ap_name,
-            "ubic_password": pass, site=sitew, site=siteord
-        })
-        return self.response(content, inspect.stack()[0].function, 'Register SDN')
+UnifiAPI.prototype.sdn_stat = function (site = undefined) {
+    return this.netsite('/stat/sdn', site = site);
+};
 
-    def sdn_stat(self):
-        """
-        Get the SDN status
-        :return:
-        """
-        content = self.sitecmdjson("/stat/sdn")
-        return self.response(content, inspect.stack()[0].function, 'Status SDN')
+UnifiAPI.prototype.sdn_onoff = function (enabled = true, site_id = '', site = undefined) {
+    return this.netsite('/set/setting/super_sdn', {
+        key: 'super_sdn',
+        enabled: enabled,
+        site_id: site_id
+    }, site = site);
+};
 
-    def sdn_onoff(self, enabled=True, site_id = None):
-        """
-        Change the status
-        :param enabled:
-        :param site_id:
-        :return:
-        """
-        content = self.sitecmdjson("/set/setting/super_sdn", {
-            "key": "super_sdn",
-            "enabled": enabled,
-            "site_id": site_id
-        })
- */
 module.exports = UnifiAPI;
