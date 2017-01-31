@@ -36,7 +36,7 @@ CloudAPI.prototype.self = function() {
 
 CloudAPI.prototype.devices = function() {
     return this.net.req('/devices', undefined, undefined, undefined,
-    baseUrl="https://device-airos.svc.ubnt.com/api/airos/v1/unifi");
+        baseUrl="https://device-airos.svc.ubnt.com/api/airos/v1/unifi");
 };
 
 CloudAPI.prototype.delete_device = function(device_id = '') {
@@ -44,8 +44,8 @@ CloudAPI.prototype.delete_device = function(device_id = '') {
         baseUrl="https://device-airos.svc.ubnt.com/api/airos/v1/unifi");
 };
 
-CloudAPI.prototype.launch_dashboard = function(dashboard) {
-    return this.net.req('/turn/creds?username='+dashboard, undefined, undefined, undefined,
+CloudAPI.prototype.turn_creds = function(device_id) {
+    return this.net.req('/turn/creds?username='+device_id, undefined, undefined, undefined,
         baseUrl="https://device-airos.svc.ubnt.com/api/airos/v1/unifi"
     );
 };
