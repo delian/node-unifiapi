@@ -8,6 +8,7 @@ let defaultOptions = {
     'password': 'unifi',
     'baseUrl': 'https://sso.ubnt.com/api/sso/v1',
     'debug': false,
+    'wss': null,
     'debugNet': false,
     'gzip': true,
     'site': 'default'
@@ -28,6 +29,7 @@ CloudAPI.prototype.login = function(username, password) {
 };
 
 CloudAPI.prototype.logout = function() {
+    this.closeWebRtc();
     return this.net.logout();
 };
 
@@ -81,9 +83,15 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
                     }
                 });
             })
-            .then(resolve)
+            .then((data) => {
+                resolve(data);
+            })
             .catch(reject);
     });
+};
+
+CloudAPI.prototype.closeWebRtc = function() {
+    if (this.wss) this.wss.disconnect();
 };
 
 module.exports = CloudAPI;
