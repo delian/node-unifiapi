@@ -24,7 +24,10 @@
     "debug": "^2.6.0",
     "merge": "^1.2.0",
     "request": "^2.79.0",
-    "request-debug": "^0.2.0"
+    "request-debug": "^0.2.0",
+    "uuid": "^3.0.1",
+    "wrtc": "0.0.61",
+    "ws": "^2.0.1"
   },
   "jshintConfig": {
     "esversion": 6
