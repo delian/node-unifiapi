@@ -2,6 +2,7 @@ let debug = require('debug')('CloudAPI');
 let merge = require('merge');
 let CloudRequest = require('./lib/cloud-request');
 let wss = require('./lib/unifi-wss');
+let wrtc = require('./lib/webrtc-request');
 
 let defaultOptions = {
     'username': 'unifi',
@@ -71,6 +72,7 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
             .then((data) => {
                 let stunUri = data.uris.filter((n) => n.match(/^stun/)).shift();
                 let turnUri = data.uris.filter((n) => n.match(/^turn/)).shift();
+                debug('WEBRTC_WS_SENDING');
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
                     payload: {
@@ -84,6 +86,16 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
                 });
             })
             .then((data) => {
+                debug('WEBRTC_SDP_RECEIVING');
+                this.wrtc = new wrtc({ debug: this.debug });
+                this.wrtc.RTCPeerConnection();
+                return this.wrtc.setRemoteDescription({
+                    type: 'offer',
+                    sdp: data.response.sdp
+                });
+            })
+            .then((data) => {
+                debug('LocalData to set', data);
                 resolve(data);
             })
             .catch(reject);
