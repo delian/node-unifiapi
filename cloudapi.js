@@ -54,7 +54,7 @@ CloudAPI.prototype.turn_creds = function(device_id) {
     );
 };
 
-CloudAPI.prototype.openWebRtc = function(device_id) {
+CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
     return new Promise((resolve, reject) => {
         this.login()
             .then(() => {
@@ -95,7 +95,16 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
                 });
             })
             .then((data) => {
-                debug('LocalData to set', data);
+                return this.wrtc.createAnswer(data);
+            })
+            .then((data) => {
+                return this.wrtc.setLocalDescription(data);
+            })
+            .then((data) => {
+                return this.wrtc.waitForIceCandidates();
+            })
+            .then((data) => {
+                debug('LocalData to send', data);
                 resolve(data);
             })
             .catch(reject);
