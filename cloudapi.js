@@ -107,12 +107,8 @@ CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
                 });
             })
             .then((data) => {
-<<<<<<< HEAD
-                debug('WEBRTC_SDP_RECEIVING');
-=======
                 debug('WEBRTC_SDP_RECEIVING', data);
                 webRtcId = data.response.webRtcId;
->>>>>>> c56bf889065b5b1806e1013cf2ab624be02074a7
                 return this.wrtc.setRemoteDescription({
                     type: 'offer',
                     sdp: this.filterTcpCandidates(data.response.sdp)
