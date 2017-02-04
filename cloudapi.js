@@ -72,6 +72,11 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
             .then((data) => {
                 let stunUri = data.uris.filter((n) => n.match(/^stun/)).shift();
                 let turnUri = data.uris.filter((n) => n.match(/^turn/)).shift();
+                this.wrtc = new wrtc({ debug: this.debug });
+                this.wrtc.RTCPeerConnection([
+                    { url: stunUri },
+                    { url: turnUri }
+                ]);
                 debug('WEBRTC_WS_SENDING');
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
@@ -87,8 +92,6 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
             })
             .then((data) => {
                 debug('WEBRTC_SDP_RECEIVING');
-                this.wrtc = new wrtc({ debug: this.debug });
-                this.wrtc.RTCPeerConnection();
                 return this.wrtc.setRemoteDescription({
                     type: 'offer',
                     sdp: data.response.sdp
