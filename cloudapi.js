@@ -54,8 +54,13 @@ CloudAPI.prototype.turn_creds = function(device_id) {
     );
 };
 
-CloudAPI.prototype.openWebRtc = function(device_id) {
+CloudAPI.prototype.filterTcpCandidates = function(sdp) {
+    return sdp.replace(/a=candidate[^\n]*tcp[^\n]*\n/g, "");
+};
+
+CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
     return new Promise((resolve, reject) => {
+        let webRtcId;
         this.login()
             .then(() => {
                 let cookie = this.net.jar.getCookieString(this.baseUrl);
@@ -78,6 +83,17 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
                     { url: turnUri }
                 ]);
                 debug('WEBRTC_WS_SENDING');
+                this.wrtc = new wrtc({ debug: this.debug });
+                this.wrtc.RTCPeerConnection({
+                    iceServers: [
+                        {
+                            url: stunUri
+                        },
+                        {
+                            url: turnUri
+                        }
+                    ]
+                }, { optional: [] });
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
                     payload: {
@@ -91,14 +107,38 @@ CloudAPI.prototype.openWebRtc = function(device_id) {
                 });
             })
             .then((data) => {
+<<<<<<< HEAD
                 debug('WEBRTC_SDP_RECEIVING');
+=======
+                debug('WEBRTC_SDP_RECEIVING', data);
+                webRtcId = data.response.webRtcId;
+>>>>>>> c56bf889065b5b1806e1013cf2ab624be02074a7
                 return this.wrtc.setRemoteDescription({
                     type: 'offer',
-                    sdp: data.response.sdp
+                    sdp: this.filterTcpCandidates(data.response.sdp)
                 });
             })
             .then((data) => {
-                debug('LocalData to set', data);
+                return this.wrtc.createAnswer(data);
+            })
+            .then((data) => {
+                return this.wrtc.setLocalDescription(data);
+            })
+            .then((data) => {
+                return this.wrtc.waitForIceCandidates(data);
+            })
+            .then((data) => {
+                debug('LocalData to send', data);
+                return this.wss.actionRequest('sdp_exchange', {
+                    device_id: device_id,
+                    payload: {
+                        sdpAnswer: data.sdp,
+                        type: 'ANSWER',
+                        webRtcId: webRtcId
+                    }
+                });
+            })
+            .then((data) => {
                 resolve(data);
             })
             .catch(reject);
