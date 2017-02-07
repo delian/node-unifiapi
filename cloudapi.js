@@ -124,16 +124,27 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
             })
             .then((data) => {
                 debug('LocalData to send', data);
+                let sdp = data.sdp;
+                let line = sdp
+                    .match(/^a=candidate:.+udp\s(\d+).+$/mig);
+                debug('line', line);
+                line = line
+                    .sort((a, b) => {
+                        let x = a.match(/udp\s+(\d+)\s/)[1];
+                        let y = b.match(/udp\s+(\d+)\s/)[1];
+                        return x>y;
+                    }).shift();
+                let ip = line.match(/udp\s+\d+\s+(\S+)\s/)[1];
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
                     payload: {
-                        sdpAnswer: data.sdp,
+                        sdpAnswer: sdp.replace("c=IN IP4 0.0.0.0","c=IN IP4 "+ip),
                         type: 'ANSWER',
                         webRtcId: webRtcId
                     }
                 });
             })
-            .theb((data) => { // Open Channels
+            .then((data) => { // Open Channels
                 return this.wrtc.openChannel('api');
             })
             .then((data) => {
