@@ -58,7 +58,7 @@ CloudAPI.prototype.filterTcpCandidates = function(sdp) {
     return sdp.replace(/a=candidate[^\n]*tcp[^\n]*\n/g, "");
 };
 
-CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
+CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
     return new Promise((resolve, reject) => {
         let webRtcId;
         this.login()
@@ -85,8 +85,7 @@ CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
                 debug('WEBRTC_WS_SENDING');
                 this.wrtc = new wrtc({ debug: this.debug });
                 this.wrtc.RTCPeerConnection({
-                    iceServers: [
-                        {
+                    iceServers: [{
                             url: stunUri
                         },
                         {
@@ -133,6 +132,9 @@ CloudAPI.prototype.openWebRtcAsCaller = function(device_id) {
                         webRtcId: webRtcId
                     }
                 });
+            })
+            .theb((data) => { // Open Channels
+                return this.wrtc.openChannel('api');
             })
             .then((data) => {
                 resolve(data);
