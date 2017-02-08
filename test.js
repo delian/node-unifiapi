@@ -4,6 +4,7 @@ let r = unifi({
     debug: true,
     debugNet: true,
     username: 'ubnt',
+    baseUrl: 'https://127.0.0.1:8443',
     password: 'UBNT'
 });
 
