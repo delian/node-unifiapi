@@ -7,6 +7,7 @@ class WRTC {
     constructor(options) {
         merge(this, options);
         this._q = {};
+        this._channel = {};
         this.log = require('debug')(this.debugName || 'WRTC');
         if (this.debug) this.log.enabled = true;
     }
@@ -120,13 +121,22 @@ class WRTC {
         });
     }
 
+    addIcePeers(list) {
+        return new Promise((resolve, reject) => {
+            this.log('Add ICE peers');
+            list.forEach((n) => n && this.peer.addIceCandidate(n));
+            resolve(list);
+        });
+    }
+
     openDataChannel(name) {
         return new Promise((resolve, reject) => {
             this.log('WEBRTC_OPEN_CHANNEL', name);
             let channel = this.peer.createDataChannel(name);
+            this._channel[name] = channel;
             channel.onopen = (event) => {
-                this.log('channel, on open', event, channel.readyState);
-                if (channel.readyState === "open") resolve();
+                this.log('channel, on open', name, event, channel.readyState);
+                if (channel.readyState === "open") resolve(channel);
             };
             channel.onmessage = (msg) => {
                 this.log('channel, on message', msg);
@@ -139,8 +149,12 @@ class WRTC {
                 this.log('channel, on close', event);
                 reject(); // Is it correct?
             };
-            resolve();
+            resolve(channel);
         });        
+    }
+
+    close() {
+        this.peer.close();
     }
 }
 
@@ -164,8 +178,8 @@ b.RTCPeerConnection([
 ]);
 
 a.openDataChannel('test')
-    .then(() => {
-        debug('Data channel for A is initiated');
+    .then((channel) => {
+        debug('Data channel for A is initiated', channel);
         return a.createOffer();
     })
     .then((data) => {
@@ -195,10 +209,20 @@ a.openDataChannel('test')
         return a.waitForIceCandidates();
     })
     .then((ices) => {
+        return a.addIcePeers(ices);
+    })
+    .then((ices) => {
         return b.waitForIceCandidates();
     })
     .then((ices) => {
-        // Nothing to do
+        return b.addIcePeers(ices);
+    })
+    .then(() => {
+        return a.openDataChannel('test');
+    })
+    .then((channelA) => {
+        debug('Data channel is supposed to be open');
+        channelA.send('test');
     })
     .catch((event) => {
         debug('ERROR, Data channel', event);
