@@ -61,6 +61,8 @@ CloudAPI.prototype.filterTcpCandidates = function(sdp) {
 CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
     return new Promise((resolve, reject) => {
         let webRtcId;
+        let sdpData;
+        let apiChannel;
         this.login()
             .then(() => {
                 let cookie = this.net.jar.getCookieString(this.baseUrl);
@@ -115,7 +117,12 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
                 return this.wrtc.setLocalDescription(data);
             })
             .then((data) => {
-                 return this.wrtc.collectIceCandidates(data);
+                sdpData = data;
+                return this.wrtc.openApiChannel();
+            })
+            .then((channel) => {
+                apiChannel = channel;
+                 return this.wrtc.collectIceCandidates(sdpData);
              })
             .then((data) => {
                 debug('LocalData to send', data);
@@ -139,11 +146,12 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
                     }
                 });
             })
-//            .then((data) => { // Open Channels
-//                return this.wrtc.openDataChannel('api'); // The channel is open
-//            })
             .then((data) => {
-                resolve(data);
+                debug('Send test message');
+                return this.wrtc.sendApiMsg('/api/s/default/stat/sta', {});
+            })
+            .then((data) => {
+                debug('Received message', data);
             })
             .catch(reject);
     });
