@@ -29,36 +29,35 @@ class WRTC {
         delete this._q[q];
     }
 
-    RTCPeerConnection(iceservers) {
-        this.peer = new wrtc.RTCPeerConnection(
-            {
-                iceServers: iceservers
-            }
-        );
-        this.peer.onicecandidate = (candidate) => {
-            this.log('I see candidate', candidate);
-            this.fireQ('onicecandidate', candidate);
-        };
-        this.peer.onsignalingstatechange = (event, a, b, c) => {
-            this.log('On signalling change', event, a, b, c);
-            this.fireQ('onsignalingstatechange', event);
-        };
-        this.peer.oniceconnectionstatechange = (event, a, b, c) => {
-            this.log('oniceconnectionstatechange', event, a, b, c);
-            this.fireQ('oniceconnectionstatechange', event);
-        };
-        this.peer.onicegatheringstatechange = (event, a, b, c) => {
-            this.log('onicegatheringstatechange', event, a, b, c);
-            this.fireQ('onicegatheringchange', event);
-        };
-        this.peer.ondatachannel = (event, a, b, c) => {
-            this.log('ondatachannel', event, a, b, c);
-            this.fireQ('ondatachannel', event);
-        };
+    RTCPeerConnection(options) {
+        debug('WRTC_PEER_OPEN', options)
+        this.peer = new wrtc.RTCPeerConnection(options);
+        [
+            'onicecandidate', 'onsignalingstatechange', 'oniceconnectionstatechange',
+            'onicegatheringstatechange', 'ondatachannel', 'onnegotiationneeded',
+            'onaddstream'
+        ].forEach((n) => {
+            this.peer[n] = (event) => {
+                this.log(n, event);
+                this.fireQ(n, event);
+            };
+        });
 
         this._icecandidates = [];
         this.registerQ('onicecandidate', (candidate) => {
             this._icecandidates.push(candidate.candidate);
+        });
+
+        this.registerQ('onsignalingstatechange', () => {
+            this.log('SIGNALING STATE',this.peer.signalingState);
+        });
+
+        this.registerQ('onicegatheringstatechange', () => {
+            this.log('ICEGATHERING STATE', this.peer.iceGatheringState);
+        });
+
+        this.registerQ('oniceconnectionstatechange', () => {
+            this.log('ICECONNECTION STATE', this.peer.iceConnectionState);
         });
     }
 
@@ -68,7 +67,7 @@ class WRTC {
             this.peer.setLocalDescription(
                 new wrtc.RTCSessionDescription(desc),
                 (data) => {
-                    resolve(data || desc);
+                    resolve(data  || desc); // Data is always null
                 },
                 reject
             );
@@ -81,19 +80,19 @@ class WRTC {
             this.peer.setRemoteDescription(
                 new wrtc.RTCSessionDescription(desc),
                 (data) => { // Create Answer
-                    resolve(data || desc);
+                    resolve(data /*|| desc*/);
                 },
                 reject
             );
         });
     }
 
-    createAnswer(desc) {
+    createAnswer(/*desc*/) {
         return new Promise((resolve, reject) => {
-            this.log('WEBRTC_CREATE_ANSWER', desc);
+            this.log('WEBRTC_CREATE_ANSWER'/*, desc*/);
             this.peer.createAnswer(
                 (data) => { // Set my local description
-                    resolve(data || desc);
+                    resolve(data /*|| desc*/);
                 },
                 reject
             );
@@ -121,15 +120,19 @@ class WRTC {
         });
     }
 
+    addIcePeer(peer) {
+        if (peer) this.peer.addIceCandidate(peer);
+    }
+
     addIcePeers(list) {
         return new Promise((resolve, reject) => {
             this.log('Add ICE peers');
-            list.forEach((n) => n && this.peer.addIceCandidate(n));
+            list.forEach((n) => this.addIcePeer(n));
             resolve(list);
         });
     }
 
-    openDataChannel(name) {
+    openDataChannel(name, half) {
         return new Promise((resolve, reject) => {
             this.log('WEBRTC_OPEN_CHANNEL', name);
             let channel = this.peer.createDataChannel(name);
@@ -168,18 +171,32 @@ let b = new WRTC({
 });
 
 // Caller
-a.RTCPeerConnection([
-    'stun:turn.ubnt.com:3478?transport=udp'
-]);
+a.RTCPeerConnection({
+    iceServers: [
+      'stun:turn.ubnt.com:3478?transport=udp'
+    ]
+});
 
 // Called
-b.RTCPeerConnection([
-    'stun:turn.ubnt.com:3478?transport=udp'
-]);
+b.RTCPeerConnection({
+    iceServers: [
+      'stun:turn.ubnt.com:3478?transport=udp'
+    ]
+});
+let channelA;
 
 a.openDataChannel('test')
     .then((channel) => {
-        debug('Data channel for A is initiated', channel);
+        //debug('Data channel for A is initiated', channel);
+        channelA = channel;
+        a.registerQ('onicecandidate', (c) => {
+            debug('A ICE, add to B', c.candidate);
+            b.addIcePeer(c.candidate);
+        });
+        b.registerQ('onicecandidate', (c) => {
+            debug('B ICE, add to A', c.candidate);
+            a.addIcePeer(c.candidate);
+        });
         return a.createOffer();
     })
     .then((data) => {
@@ -205,22 +222,19 @@ a.openDataChannel('test')
         // Set the datachannel for b
         return b.openDataChannel('test');
     })
+    // .then(() => {
+    //     return a.waitForIceCandidates();
+    // })
+    // .then((ices) => {
+    //     return a.addIcePeers(ices);
+    // })
+    // .then((ices) => {
+    //     return b.waitForIceCandidates();
+    // })
+    // .then((ices) => {
+    //     return b.addIcePeers(ices);
+    // })
     .then(() => {
-        return a.waitForIceCandidates();
-    })
-    .then((ices) => {
-        return a.addIcePeers(ices);
-    })
-    .then((ices) => {
-        return b.waitForIceCandidates();
-    })
-    .then((ices) => {
-        return b.addIcePeers(ices);
-    })
-    .then(() => {
-        return a.openDataChannel('test');
-    })
-    .then((channelA) => {
         debug('Data channel is supposed to be open');
         channelA.send('test');
     })

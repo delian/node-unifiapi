@@ -77,11 +77,6 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
             .then((data) => {
                 let stunUri = data.uris.filter((n) => n.match(/^stun/)).shift();
                 let turnUri = data.uris.filter((n) => n.match(/^turn/)).shift();
-                this.wrtc = new wrtc({ debug: this.debug });
-                this.wrtc.RTCPeerConnection([
-                    { url: stunUri },
-                    { url: turnUri }
-                ]);
                 debug('WEBRTC_WS_SENDING');
                 this.wrtc = new wrtc({ debug: this.debug });
                 this.wrtc.RTCPeerConnection({
@@ -108,7 +103,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
             .then((data) => {
                 debug('WEBRTC_SDP_RECEIVING', data);
                 webRtcId = data.response.webRtcId;
-                return this.wrtc.setRemoteDescription({
+                return this.wrtc.setRemoteDescription({ // TODO: Check if properties are ok
                     type: 'offer',
                     sdp: this.filterTcpCandidates(data.response.sdp)
                 });
@@ -120,8 +115,8 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
                 return this.wrtc.setLocalDescription(data);
             })
             .then((data) => {
-                return this.wrtc.waitForIceCandidates(data);
-            })
+                 return this.wrtc.collectIceCandidates(data);
+             })
             .then((data) => {
                 debug('LocalData to send', data);
                 let sdp = data.sdp;
@@ -144,9 +139,9 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
                     }
                 });
             })
-            .then((data) => { // Open Channels
-                return this.wrtc.openChannel('api');
-            })
+//            .then((data) => { // Open Channels
+//                return this.wrtc.openDataChannel('api'); // The channel is open
+//            })
             .then((data) => {
                 resolve(data);
             })
