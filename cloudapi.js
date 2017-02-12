@@ -12,8 +12,10 @@ let defaultOptions = {
     'debug': false,
     'wss': null,
     'api': null,
+    'deviceId': '',
     'debugNet': false,
     'gzip': true,
+    'wrtcOpen': false,
     'site': 'default'
 };
 
@@ -24,6 +26,16 @@ function CloudAPI(options) {
     if (typeof this.net === 'undefined') {
         this.net = new CloudRequest(merge(true, defaultOptions, options));
     }
+    this.api = new UnifiAPI({
+        baseUrl: '',
+        debug: this.debug,
+        net: {
+            login: () => this.cloudLogin(),
+            logout: () => this.cloudLogout(),
+            req: (url, jsonParams, headers, method, baseUrl) => this.cloudReq(url, jsonParams, headers, method, baseUrl)
+        }
+    });
+
     debug('CloudAPI Initialized with options %o', options);
 }
 
@@ -60,7 +72,8 @@ CloudAPI.prototype.filterTcpCandidates = function(sdp) {
     return sdp.replace(/a=candidate[^\n]*tcp[^\n]*\n/g, "");
 };
 
-CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
+CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
+    let device_id = deviceId || this.deviceId;
     return new Promise((resolve, reject) => {
         let webRtcId;
         let sdpData;
@@ -154,15 +167,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
             })
             .then((data) => {
                 debug('Received test response', data);
-                this.api = new UnifiAPI({
-                    baseUrl: '',
-                    debug: this.debug,
-                    net: {
-                        login: () => this.cloudLogin(),
-                        logout: () => this.cloudLogout(),
-                        req: (url, jsonParams, headers, method, baseUrl) => this.cloudReq(url, jsonParams, headers, method, baseUrl)
-                    }
-                });
+                this.wrtcOpen = device_id;
                 resolve(this.api);
             })
             .catch(reject);
@@ -171,8 +176,9 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
 
 CloudAPI.prototype.cloudLogin = function() {
     return new Promise((resolve, reject) => {
+        if (this.wrtcOpen) return resolve();
         debug('cloudLogin');
-        resolve(); // I have to fix the response
+        this.openWebRtcAsCalled().then(resolve).catch(reject);
     });
 };
 
@@ -180,6 +186,7 @@ CloudAPI.prototype.cloudLogout = function() {
     return new Promise((resolve, reject) => {
         debug('cloudLogout');
         this.closeWebRtc();
+        this.wrtcOpen = null;
         resolve(); // I have to fix the response
     });
 };
@@ -190,27 +197,32 @@ CloudAPI.prototype.cloudReq = function(url = '/', jsonParams = undefined, header
     }
     return new Promise((resolve, reject) => {
         debug('CloudRequest', url, jsonParams, headers, method, baseUrl);
-        this.wrtc.sendApiMsg(url, {
-            contentType: headers ? headers['Content-Type']||'application/json':'application/json',
-            method: method,
-            data: jsonParams
-        }).then((data) => {
-            if (data && data.request && data.request.rc == 'ok') {
-                resolve({
-                    meta: {
-                        rc: data.request.rc
-                    },
-                    data: data.data
+        this.cloudLogin()
+            .then(() => {
+                return this.wrtc.sendApiMsg(url, {
+                    contentType: headers ? headers['Content-Type']||'application/json':'application/json',
+                    method: method,
+                    data: jsonParams
                 });
-            } else {
-                reject({
-                    meta: {
-                        rc: (data && data.request)?data.request.rc||'error':'error'
-                    },
-                    data: (data && data.data)?data.data:null
-                });
-            }
-        }).catch(reject);
+            })
+            .then((data) => {
+                if (data && data.request && data.request.rc == 'ok') {
+                    resolve({
+                        meta: {
+                            rc: data.request.rc
+                        },
+                        data: data.data
+                    });
+                } else {
+                    reject({
+                        meta: {
+                            rc: (data && data.request)?data.request.rc||'error':'error'
+                        },
+                        data: (data && data.data)?data.data:null
+                    });
+                }
+            })
+            .catch(reject);
     });
 };
 
