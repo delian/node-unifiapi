@@ -575,7 +575,7 @@ UnifiAPI.prototype.sdn_register = function(username, password, site = undefined)
 };
 
 UnifiAPI.prototype.sdn_stat = function(site = undefined) {
-    return this.netsite('/stat/sdn', site = site);
+    return this.netsite('/stat/sdn', undefined, {}, undefined, site);
 };
 
 UnifiAPI.prototype.sdn_onoff = function(enabled = true, site_id = '', site = undefined) {
