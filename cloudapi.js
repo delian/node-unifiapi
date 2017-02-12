@@ -3,6 +3,7 @@ let merge = require('merge');
 let CloudRequest = require('./lib/cloud-request');
 let wss = require('./lib/unifi-wss');
 let wrtc = require('./lib/webrtc-request');
+let UnifiAPI = require('./index');
 
 let defaultOptions = {
     'username': 'unifi',
@@ -10,6 +11,7 @@ let defaultOptions = {
     'baseUrl': 'https://sso.ubnt.com/api/sso/v1',
     'debug': false,
     'wss': null,
+    'api': null,
     'debugNet': false,
     'gzip': true,
     'site': 'default'
@@ -148,17 +150,73 @@ CloudAPI.prototype.openWebRtcAsCalled = function(device_id) {
             })
             .then((data) => {
                 debug('Send test message');
-                return this.wrtc.sendApiMsg('/api/s/default/stat/sta', {});
+                return this.wrtc.sendApiMsg('/api/self', {});
             })
             .then((data) => {
-                debug('Received message', data);
+                debug('Received test response', data);
+                this.api = new UnifiAPI({
+                    baseUrl: '',
+                    debug: this.debug,
+                    net: {
+                        login: () => this.cloudLogin(),
+                        logout: () => this.cloudLogout(),
+                        req: (url, jsonParams, headers, method, baseUrl) => this.cloudReq(url, jsonParams, headers, method, baseUrl)
+                    }
+                });
+                resolve(this.api);
             })
             .catch(reject);
     });
 };
 
+CloudAPI.prototype.cloudLogin = function() {
+    return new Promise((resolve, reject) => {
+        debug('cloudLogin');
+        resolve(); // I have to fix the response
+    });
+};
+
+CloudAPI.prototype.cloudLogout = function() {
+    return new Promise((resolve, reject) => {
+        debug('cloudLogout');
+        this.closeWebRtc();
+        resolve(); // I have to fix the response
+    });
+};
+
+CloudAPI.prototype.cloudReq = function(url = '/', jsonParams = undefined, headers = {}, method = undefined, baseUrl = undefined) {
+    if (typeof method === 'undefined') {
+        if (typeof jsonParams === 'undefined') method = 'GET'; else method = 'POST';
+    }
+    return new Promise((resolve, reject) => {
+        debug('CloudRequest', url, jsonParams, headers, method, baseUrl);
+        this.wrtc.sendApiMsg(url, {
+            contentType: headers ? headers['Content-Type']||'application/json':'application/json',
+            method: method,
+            data: jsonParams
+        }).then((data) => {
+            if (data && data.request && data.request.rc == 'ok') {
+                resolve({
+                    meta: {
+                        rc: data.request.rc
+                    },
+                    data: data.data
+                });
+            } else {
+                reject({
+                    meta: {
+                        rc: (data && data.request)?data.request.rc||'error':'error'
+                    },
+                    data: (data && data.data)?data.data:null
+                });
+            }
+        }).catch(reject);
+    });
+};
+
 CloudAPI.prototype.closeWebRtc = function() {
     if (this.wss) this.wss.disconnect();
+    if (this.wrtc) this.wrtc.close();
 };
 
 module.exports = CloudAPI;
