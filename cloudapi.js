@@ -120,7 +120,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
             .then((data) => {
                 debug('WEBRTC_SDP_RECEIVING', data);
                 webRtcId = data.response.webRtcId;
-                return this.wrtc.setRemoteDescription({ // TODO: Check if properties are ok
+                return this.wrtc.setRemoteDescription({
                     type: 'offer',
                     sdp: this.filterTcpCandidates(data.response.sdp)
                 });
@@ -137,7 +137,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
             })
             .then((channel) => {
                 apiChannel = channel;
-                 return this.wrtc.collectIceCandidates(sdpData);
+                return this.wrtc.collectIceCandidates(sdpData);
              })
             .then((data) => {
                 debug('LocalData to send', data);

@@ -1,6 +1,7 @@
 let debug = require('debug')('UnifiAPI');
 let merge = require('merge');
 let UnifiRequest = require('./lib/unifi-request');
+let wrtc = require('./lib/webrtc-request');
 
 let defaultOptions = {
     'username': 'unifi',
@@ -584,6 +585,107 @@ UnifiAPI.prototype.sdn_onoff = function(enabled = true, site_id = '', site = und
         enabled: enabled,
         site_id: site_id
     }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.extend_voucher = function(voucher_id = '', site = undefined) {
+    return this.netsite('/set/setting/super_sdn', {
+        cmd: 'extend',
+        _id: voucher_id
+    }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.buildSSHSession = function(mac, uuid, ttl = "-1", stun = undefined, turn = undefined, username = undefined, password = undefined, site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'build-ssh-session',
+        mac: mac,
+        uuid: uuid,
+        ttl: ttl,
+        stun: stun,
+        turn: turn,
+        username: username,
+        password: password
+    }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.getSDPOffer = function(mac, uuid, site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'get-sdp-offer',
+        mac: mac,
+        uuid: uuid
+    }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.sshSDPAnswer = function(mac, uuid, sdpanswer, site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'get-sdp-offer',
+        mac: mac,
+        uuid: uuid,
+        sdpanswer: sdpanswer
+    }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.closeSSHSession = function(mac, uuid, site = undefined) {
+    return this.netsite('/cmd/devmgr', {
+        cmd: 'ssh-sdp-answer',
+        mac: mac,
+        uuid: uuid,
+        sdpanswer: sdpanswer
+    }, {}, undefined, site);
+};
+
+UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, password, site = undefined) {
+    return new Promise((resolve, reject) => {
+        let sdpOffer;
+        let sdpData;
+        let sshChannel;
+        this.buildSSHSession(mac,uuid, "-1", stun, turn, username, password, site)
+            .then(() => {
+                this.wrtc = new wrtc({ debug: this.debug });
+                this.wrtc.RTCPeerConnection(); // ICE Servers
+                return this.getSDPOffer(mac, uuid, site);
+            })
+            .then((data) => {
+                sdpOffer = data.data.shift().ssh_sdp_offer;
+                debug('SSH SDP Offer is', sdpOffer);
+                return this.wrtc.setRemoteDescription({
+                    type: 'offer',
+                    sdp: sdpOffer
+                });
+            })
+            .then((data) => {
+                return this.wrtc.createAnswer(data);
+            })
+            .then((data) => {
+                return this.wrtc.setLocalDescription(data);
+            })
+            .then((data) => {
+                sdpData = data;
+                return this.wrtc.openDataChannel('ssh');
+            })
+            .then((channel) => {
+                sshChannel = channel;
+                return this.wrtc.collectIceCandidates(sdpData);
+            })
+            .then((data) => {
+                debug('LocalData to send', data);
+                let sdp = data.sdp;
+                let line = sdp
+                    .match(/^a=candidate:.+udp\s(\d+).+$/mig);
+                debug('line', line);
+                line = line
+                    .sort((a, b) => {
+                        let x = a.match(/udp\s+(\d+)\s/)[1];
+                        let y = b.match(/udp\s+(\d+)\s/)[1];
+                        return x>y;
+                    }).shift();
+                let ip = line.match(/udp\s+\d+\s+(\S+)\s/)[1];
+                return this.sshSDPAnswer(mac, uuid, sdp.replace("c=IN IP4 0.0.0.0","c=IN IP4 "+ip), site);
+            })
+            .then((data) => {
+                debug('Channel is supposed to be open now');
+            })
+            .catch(reject);
+    });
 };
 
 module.exports = UnifiAPI;
