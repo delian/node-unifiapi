@@ -755,11 +755,15 @@ function SSHChannel(channel, obj, mac, uuid, site) {
 }
 
 SSHChannel.prototype.send = function(msg) {
+    debug('SSHChannel send', msg);
     this.channel.send(msg);
 };
 
 SSHChannel.prototype.recv = function() {
-    return this.channel.buffer;
+    let buf = this.buffer;
+    this.buffer = "";
+    debug('SSHChannel recv', buf);
+    return buf;
 };
 
 SSHChannel.prototype.close = function() {
