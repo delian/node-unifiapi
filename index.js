@@ -697,6 +697,7 @@ SSHSession.prototype.connect = function() {
                 this.wrtc.setCallback('oniceconnectionstatechange', () => {
                     let state = this.wrtc.peer.iceConnectionState;
                     if (state == 'disconnected' || state == 'failed') {
+                        this.log('We are notified for session disconnection');
                         if (this.state != "open") return reject('SSH Connection fail');
                         this.state = "closed";
                         this.close();
