@@ -613,10 +613,10 @@ UnifiAPI.prototype.getSDPOffer = function(mac, uuid, site = undefined) {
         let count = 10;
         let retry = () => {
             this.netsite('/cmd/devmgr', {
-                cmd: 'get-sdp-offer',
-                mac: mac,
-                uuid: uuid
-            }, {}, undefined, site)
+                    cmd: 'get-sdp-offer',
+                    mac: mac,
+                    uuid: uuid
+                }, {}, undefined, site)
                 .then((data) => {
                     if (data && data.data && data.data instanceof Array && data.data.length === 0) {
                         // Empty response
@@ -652,15 +652,32 @@ UnifiAPI.prototype.closeSSHSession = function(mac, uuid, site = undefined) {
 };
 
 UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, password, site = undefined) {
+    return new SSHSession(this, mac, uuid, stun, turn, username, password, site);
+};
+
+function SSHSession(unifi, mac, uuid, stun, turn, username, password, site = undefined) {
+    this.unifi = unifi;
+    this.mac = mac;
+    this.uuid = uuid || Uuid.v4();
+    this.stun = stun;
+    this.turn = turn;
+    this.username = username;
+    this.password = password;
+    this.site = site;
+    this.channel = undefined;
+    this.debug = this.unifi.debug;
+    this.log = require('debug')('Unifi SSH');
+    this.log.enabled = this.debug;
+    this.buffer = "";
+}
+
+SSHSession.prototype.connect = function() {
     return new Promise((resolve, reject) => {
         let sdpOffer;
         let sdpData;
         let sshChannel;
         let timeoutChannel = null;
-        if (typeof uuid === 'undefined') {
-            uuid = Uuid.v4();
-        }
-        this.buildSSHSession(mac,uuid, "-1", stun, turn, username, password, site)
+        this.unifi.buildSSHSession(this.mac, this.uuid, "-1", this.stun, this.turn, this.username, this.password, this.site)
             .then(() => {
                 this.wrtc = new wrtc({ debug: this.debug });
                 this.wrtc.RTCPeerConnection(
@@ -676,15 +693,29 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
                     // { optional: [] }
                 ); // ICE Servers
                 this.wrtc.setCallback('ondatachannel', (event) => {
-                    debug('GREAT, we have the channel open!', event.channel);
+                    this.log('GREAT, we have the session channel', event.channel);
                     clearTimeout(timeoutChannel);
-                    resolve(new SSHChannel(event.channel,this,mac,uuid,site));
+                    this.channel = event.channel;
+                    this.channel.onopen = () => {
+                        this.log('SSH session is open');
+                    };
+                    this.channel.onclose = () => {
+                        this.log('SSH session is closed');
+                    };
+                    this.channel.onmessage = (event) => {
+                        let u = new Uint8Array(event.data);
+                        let s = "";
+                        for (let i = 0; i < u.byteLength; i++) s += String.fromCharCode(u[i]);
+                        this.log('SSHChannel message', s);
+                        this.buffer += s;
+                    };
+                    resolve(this);
                 });
-                return this.getSDPOffer(mac, uuid, site);
+                return this.unifi.getSDPOffer(this.mac, this.uuid, this.site);
             })
             .then((data) => {
                 sdpOffer = data.data.shift().ssh_sdp_offer;
-                debug('SSH SDP Offer is', sdpOffer);
+                this.log('SSH SDP Offer is', sdpOffer);
                 return this.wrtc.setRemoteDescription({
                     type: 'offer',
                     sdp: sdpOffer
@@ -696,7 +727,7 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
             .then((data) => {
                 return this.wrtc.setLocalDescription(data);
             })
-            .then((data) => {
+            .then((data) => { // TODO: remove this, its not necessary
                 sdpData = data;
                 return this.wrtc.openDataChannel('ssh');
             })
@@ -705,24 +736,24 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
                 return this.wrtc.collectIceCandidates(sdpData);
             })
             .then((data) => {
-                debug('LocalData to send', data);
+                this.log('LocalData to send', data);
                 let sdp = data.sdp;
                 let line = sdp
                     .match(/^a=candidate:.+udp\s(\d+).+$/mig);
-                debug('line', line);
+                this.log('line', line);
                 line = line
                     .sort((a, b) => {
                         let x = a.match(/udp\s+(\d+)\s/)[1];
                         let y = b.match(/udp\s+(\d+)\s/)[1];
-                        return x>y;
+                        return x > y;
                     }).shift();
                 let ip = line.match(/udp\s+\d+\s+(\S+)\s/)[1];
-                return this.sshSDPAnswer(mac, uuid, sdp.replace("c=IN IP4 0.0.0.0","c=IN IP4 "+ip), site);
+                return this.unifi.sshSDPAnswer(this.mac, this.uuid, sdp.replace("c=IN IP4 0.0.0.0", "c=IN IP4 " + ip), this.site);
             })
             .then((data) => {
-                debug('Channel is supposed to be open now. Lets wait');
+                this.log('Channel is supposed to be open now. Lets wait');
                 timeoutChannel = setTimeout(() => {
-                    this.closeSSHSession(mac, uuid, site)
+                    this.unifi.closeSSHSession(this.mac, this.uuid, this.site)
                         .then(reject)
                         .catch(reject);
                 }, 10000);
@@ -731,42 +762,19 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
     });
 };
 
-function SSHChannel(channel, obj, mac, uuid, site) {
-    this.channel = channel;
-    this.unifi = obj;
-    this.mac = mac;
-    this.uuid = uuid;
-    this.site = site;
-    this.buffer = "";
-
-    channel.onopen = () => {
-        debug('SSHChannel open');
-    };
-    channel.onclose = () => {
-        debug('SSHChannel close');
-    };
-    channel.onmessage = (event) => {
-        let u = new Uint8Array(event.data);
-        let s = "";
-        for (let i = 0; i<u.byteLength; i++) s+=String.fromCharCode(u[i]);
-        debug('SSHChannel message', s);
-        this.buffer += s;
-    };
-}
-
-SSHChannel.prototype.send = function(msg) {
-    debug('SSHChannel send', msg);
+SSHSession.prototype.send = function(msg) {
+    debug('send:', msg);
     this.channel.send(msg);
 };
 
-SSHChannel.prototype.recv = function() {
+SSHSession.prototype.recv = function() {
     let buf = this.buffer;
     this.buffer = "";
-    debug('SSHChannel recv', buf);
+    debug('recv:', buf);
     return buf;
 };
 
-SSHChannel.prototype.close = function() {
+SSHSession.prototype.close = function() {
     this.unifi.closeSSHSession(this.mac, this.uuid, this.site);
 };
 
