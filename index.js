@@ -669,6 +669,7 @@ function SSHSession(unifi, mac, uuid, stun, turn, username, password, site = und
     this.log = require('debug')('Unifi SSH');
     this.log.enabled = this.debug;
     this.buffer = "";
+    this.status = "closed";
 }
 
 SSHSession.prototype.connect = function() {
@@ -677,6 +678,7 @@ SSHSession.prototype.connect = function() {
         let sdpData;
         let sshChannel;
         let timeoutChannel = null;
+        if (this.status == "open") return resolve(this);
         this.unifi.buildSSHSession(this.mac, this.uuid, "-1", this.stun, this.turn, this.username, this.password, this.site)
             .then(() => {
                 this.wrtc = new wrtc({ debug: this.debug });
@@ -692,12 +694,21 @@ SSHSession.prototype.connect = function() {
                     // ]},
                     // { optional: [] }
                 ); // ICE Servers
+                this.wrtc.setCallback('oniceconnectionstatechange', () => {
+                    let state = this.wrtc.peer.iceConnectionState;
+                    if (state == 'disconnected' || state == 'failed') {
+                        if (this.state != "open") return reject('SSH Connection fail');
+                        this.state = "closed";
+                        this.close();
+                    }
+                });
                 this.wrtc.setCallback('ondatachannel', (event) => {
                     this.log('GREAT, we have the session channel', event.channel);
                     clearTimeout(timeoutChannel);
                     this.channel = event.channel;
                     this.channel.onopen = () => {
                         this.log('SSH session is open');
+                        this.status = "open";
                     };
                     this.channel.onclose = () => {
                         this.log('SSH session is closed');
@@ -775,7 +786,8 @@ SSHSession.prototype.recv = function() {
 };
 
 SSHSession.prototype.close = function() {
-    this.unifi.closeSSHSession(this.mac, this.uuid, this.site);
+    this.status = "closed";
+    return this.unifi.closeSSHSession(this.mac, this.uuid, this.site);
 };
 
 module.exports = UnifiAPI;
