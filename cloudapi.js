@@ -35,6 +35,9 @@ function CloudAPI(options) {
             req: (url, jsonParams, headers, method, baseUrl) => this.cloudReq(url, jsonParams, headers, method, baseUrl)
         }
     });
+    this._qqq = {
+        openWebRtcAsCalled: []
+    };
 
     debug('CloudAPI Initialized with options %o', options);
 }
@@ -75,6 +78,8 @@ CloudAPI.prototype.filterTcpCandidates = function(sdp) {
 CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
     let device_id = deviceId || this.deviceId;
     return new Promise((resolve, reject) => {
+        this._qqq.openWebRtcAsCalled.push({ resolve: resolve, reject: reject });
+        if (this._qqq.openWebRtcAsCalled.length > 1) return; // We are having already one waiting
         let webRtcId;
         let sdpData;
         let apiChannel;
@@ -138,7 +143,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
             .then((channel) => {
                 apiChannel = channel;
                 return this.wrtc.collectIceCandidates(sdpData);
-             })
+            })
             .then((data) => {
                 debug('LocalData to send', data);
                 let sdp = data.sdp;
@@ -149,13 +154,13 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
                     .sort((a, b) => {
                         let x = a.match(/udp\s+(\d+)\s/)[1];
                         let y = b.match(/udp\s+(\d+)\s/)[1];
-                        return x>y;
+                        return x > y;
                     }).shift();
                 let ip = line.match(/udp\s+\d+\s+(\S+)\s/)[1];
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
                     payload: {
-                        sdpAnswer: sdp.replace("c=IN IP4 0.0.0.0","c=IN IP4 "+ip),
+                        sdpAnswer: sdp.replace("c=IN IP4 0.0.0.0", "c=IN IP4 " + ip),
                         type: 'ANSWER',
                         webRtcId: webRtcId
                     }
@@ -168,9 +173,14 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
             .then((data) => {
                 debug('Received test response', data);
                 this.wrtcOpen = device_id;
-                resolve(this.api);
+                this._qqq.openWebRtcAsCalled.forEach(n => n.resolve(this.api));
+                this._qqq.openWebRtcAsCalled = [];
             })
-            .catch(reject);
+            .catch(e => {
+                debug('Error in opening webrtc');
+                this._qqq.openWebRtcAsCalled.forEach(n => n.reject(this.api));
+                this._qqq.openWebRtcAsCalled = [];
+            });
     });
 };
 
@@ -193,14 +203,15 @@ CloudAPI.prototype.cloudLogout = function() {
 
 CloudAPI.prototype.cloudReq = function(url = '/', jsonParams = undefined, headers = {}, method = undefined, baseUrl = undefined) {
     if (typeof method === 'undefined') {
-        if (typeof jsonParams === 'undefined') method = 'GET'; else method = 'POST';
+        if (typeof jsonParams === 'undefined') method = 'GET';
+        else method = 'POST';
     }
     return new Promise((resolve, reject) => {
         debug('CloudRequest', url, jsonParams, headers, method, baseUrl);
         this.cloudLogin()
             .then(() => {
                 return this.wrtc.sendApiMsg(url, {
-                    contentType: headers ? headers['Content-Type']||'application/json':'application/json',
+                    contentType: headers ? headers['Content-Type'] || 'application/json' : 'application/json',
                     method: method,
                     data: jsonParams
                 });
@@ -216,9 +227,9 @@ CloudAPI.prototype.cloudReq = function(url = '/', jsonParams = undefined, header
                 } else {
                     reject({
                         meta: {
-                            rc: (data && data.request)?data.request.rc||'error':'error'
+                            rc: (data && data.request) ? data.request.rc || 'error' : 'error'
                         },
-                        data: (data && data.data)?data.data:null
+                        data: (data && data.data) ? data.data : null
                     });
                 }
             })
