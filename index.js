@@ -162,6 +162,10 @@ UnifiAPI.prototype.list_guests = function(historyhours = 8670, site = undefined)
     }, {}, undefined, site);
 };
 
+UnifiAPI.prototype.list_guests2 = function(historyhours = 8670, site = undefined) {
+    return this.netsite('/stat/guest?within=' + historyhours, undefined, {}, undefined, site);
+};
+
 UnifiAPI.prototype.list_clients = function(mac = '', site = undefined) {
     return this.netsite('/stat/sta/' + mac, undefined, {}, undefined, site);
 };
