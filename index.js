@@ -369,6 +369,68 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
     }, {}, undefined, site);
 };
 
+UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id) {
+    let o = merge({}, {
+        _id: guest_id || obj._id,
+        site_id: site_id || obj.site_id,
+        "auth": "hotspot",
+        "expire": "480",
+        "facebook_enabled": false,
+        "google_enabled": false,
+        "key": "guest_access",
+        "payment_enabled": false,
+        "payment_fields_address_enabled": true,
+        "payment_fields_address_required": true,
+        "payment_fields_city_enabled": true,
+        "payment_fields_city_required": true,
+        "payment_fields_country_default": "",
+        "payment_fields_country_enabled": true,
+        "payment_fields_country_required": true,
+        "payment_fields_first_name_enabled": true,
+        "payment_fields_first_name_required": true,
+        "payment_fields_last_name_enabled": true,
+        "payment_fields_last_name_required": true,
+        "payment_fields_state_enabled": true,
+        "payment_fields_state_required": true,
+        "payment_fields_zip_enabled": true,
+        "payment_fields_zip_required": true,
+        "portal_customized": false,
+        "portal_customized_bg_color": "#cccccc",
+        "portal_customized_bg_image_enabled": false,
+        "portal_customized_bg_image_tile": true,
+        "portal_customized_box_color": "#ffffff",
+        "portal_customized_box_link_color": "#1379b7",
+        "portal_customized_box_opacity": 90,
+        "portal_customized_box_text_color": "#000000",
+        "portal_customized_button_color": "#1379b7",
+        "portal_customized_button_text_color": "#ffffff",
+        "portal_customized_languages": ["en"],
+        "portal_customized_link_color": "#1379b7",
+        "portal_customized_logo_enabled": false,
+        "portal_customized_text_color": "#000000",
+        "portal_customized_title": "Hotspot portal",
+        "portal_customized_tos": "Terms of Use\n\nBy accessing the wireless network, you acknowledge that you're of legal age, you have read and understood and agree to be bound by this agreement.\n\nThe wireless network service is provided by the property owners and is completely at their discretion. Your access to the network may be blocked, suspended, or terminated at any time for any reason.\n\nYou agree not to use the wireless network for any purpose that is unlawful and take full responsibility of your acts.\n\nThe wireless network is provided \"as is\" without warranties of any kind, either expressed or implied.",
+        "portal_customized_tos_enabled": true,
+        "portal_customized_welcome_text_enabled": true,
+        "portal_customized_welcome_text_position": "under_logo",
+        "portal_enabled": true,
+        "redirect_enabled": false,
+        "redirect_https": false,
+        "redirect_to_https": false,
+        "redirect_url": "",
+        "restricted_subnet_1": "192.168.0.0/16",
+        "restricted_subnet_2": "172.16.0.0/12",
+        "restricted_subnet_3": "10.0.0.0/8",
+        "template_engine": "angular",
+        "voucher_customized": false,
+        "voucher_enabled": true,
+        "x_facebook_app_secret": "UBNT",
+        "x_google_client_secret": "UBNT",
+        "x_password": "UBNT"
+    }, obj);
+    return this.netsite('/set/setting/guest_access/' + o._id, o, {}, undefined, site);
+};
+
 UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, portal_customized = true,
     redirect_enabled = false, redirect_url = '', x_password = '', expire_number = undefined,
     expire_unit = undefined, site_id = undefined, site = undefined) {
@@ -518,9 +580,10 @@ UnifiAPI.prototype.set_hotspot2 = function(hs_id = '', name = undefined, network
     }, {}, 'PUT', site);
 };
 
-UnifiAPI.prototype.add_wlanconf = function(name, security = 'open', enabled = true, dtim_mode = 'default',
+UnifiAPI.prototype.add_wlanconf = function(name, is_guest = true, usergroup_id = undefined, wlangroup_id = undefined,
+    security = 'open', enabled = true, dtim_mode = 'default',
     dtim_na = 1, dtim_ng = 1, mac_filter_enabled = false, mac_filter_list = [], mac_filter_policy = 'deny',
-    radius_port_1 = 1812, schedule = [], schedule_enabled = false, usergroup_id = undefined, wlangroup_id = undefined,
+    radius_port_1 = 1812, schedule = [], schedule_enabled = false,
     usergroup = 'Default', wlangroup = 'Default', wep_idx = 1, wpa_enc = 'ccmp', wpa_mode = 'wpa2',
     ratectrl_na_6 = "basic", ratectrl_na_9 = "supported", ratectrl_na_12 = "basic", ratectrl_na_18 = "supported",
     ratectrl_na_24 = "basic", ratectrl_na_36 = "supported", ratectrl_na_48 = "supported", ratectrl_na_54 = "supported",
@@ -531,6 +594,7 @@ UnifiAPI.prototype.add_wlanconf = function(name, security = 'open', enabled = tr
 ) {
     return this.netsite('/rest/wlanconf', {
         "name": name,
+        "is_guest": is_guest,
         "security": security,
         "dtim_mode": dtim_mode,
         "dtim_na": dtim_na,
