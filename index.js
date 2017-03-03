@@ -66,6 +66,13 @@ UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
     }, {}, undefined, site);
 };
 
+UnifiAPI.prototype.terminate_guest = function(id = '', site = undefined) {
+    return this.netsite('/cmd/hotspot', {
+        _id: id,
+        cmd: 'terminate'
+    }, {}, undefined, site);
+};
+
 UnifiAPI.prototype.block_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'block-sta',
