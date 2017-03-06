@@ -369,7 +369,7 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
     }, {}, undefined, site);
 };
 
-UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id) {
+UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id, site = undefined) {
     let o = merge({}, {
         _id: guest_id || obj._id,
         site_id: site_id || obj.site_id,
