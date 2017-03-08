@@ -729,4 +729,16 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
     return new SSHSession(this, mac, uuid, stun, turn, username, password, site);
 };
 
+UnifiAPI.prototype.getSshTurnServers = function() {
+    return new Promise((resolve, reject) => {
+        debug('Respond with stun/turn servers');
+        resolve({
+            stun: 'stun:stun.l.google.com:19302',
+            turn: 'turn:numb.viagenie.ca',
+            username: 'webrtc@live.com',
+            password: 'muazkh'
+        });
+    });
+};
+
 module.exports = UnifiAPI;
