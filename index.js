@@ -741,4 +741,11 @@ UnifiAPI.prototype.getSshTurnServers = function() {
     });
 };
 
+UnifiAPI.prototype.getTurnCredentials = function(site = undefined) {
+    return this.netsite('/cmd/sdn', {
+        cmd: 'get-turn-credentials'
+    }, {}, undefined, site);
+
+};
+
 module.exports = UnifiAPI;

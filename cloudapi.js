@@ -103,10 +103,12 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
                 this.wrtc = new wrtc({ debug: this.debug });
                 this.wrtc.RTCPeerConnection({
                     iceServers: [{
-                            url: stunUri
+                            urls: stunUri
                         },
                         {
-                            url: turnUri
+                            urls: turnUri,
+                            username: data.username,
+                            credential: data.password
                         }
                     ]
                 }, { optional: [] });
