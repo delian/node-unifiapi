@@ -115,7 +115,7 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
                     ]
                 }, {
                     optional: [
-                        { DtlsSrtpKeyAgreement: false },
+                        { DtlsSrtpKeyAgreement: true },
                         { RtpDataChannels: true }
                     ]
                 });
