@@ -103,15 +103,22 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
                 this.wrtc = new wrtc({ debug: this.debug });
                 this.wrtc.RTCPeerConnection({
                     iceServers: [{
-                            urls: stunUri
+                            urls: stunUri,
+                            url: this.stun
                         },
                         {
                             urls: turnUri,
+                            url: this.turn,
                             username: data.username,
                             credential: data.password
                         }
                     ]
-                }, { optional: [] });
+                }, {
+                    optional: [
+                        { DtlsSrtpKeyAgreement: false },
+                        { RtpDataChannels: true }
+                    ]
+                });
                 return this.wss.actionRequest('sdp_exchange', {
                     device_id: device_id,
                     payload: {
