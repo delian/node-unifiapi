@@ -725,8 +725,8 @@ UnifiAPI.prototype.closeSSHSession = function(mac, uuid, site = undefined) {
     }, {}, undefined, site);
 };
 
-UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, password, site = undefined) {
-    return new SSHSession(this, mac, uuid, stun, turn, username, password, site);
+UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, password, site, autoclose, webrtc, waiter) {
+    return new SSHSession(this, mac, uuid, stun, turn, username, password, site, autoclose, webrtc || this.webrtc, waiter || this.waiter);
 };
 
 UnifiAPI.prototype.getSshTurnServers = function() {

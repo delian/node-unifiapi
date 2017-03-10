@@ -26,7 +26,7 @@ function CloudAPI(options) {
     if (typeof this.net === 'undefined') {
         this.net = new CloudRequest(merge(true, defaultOptions, options));
     }
-    this.api = new UnifiAPI({
+    let o = {
         baseUrl: '',
         debug: this.debug,
         net: {
@@ -34,7 +34,10 @@ function CloudAPI(options) {
             logout: () => this.cloudLogout(),
             req: (url, jsonParams, headers, method, baseUrl) => this.cloudReq(url, jsonParams, headers, method, baseUrl)
         }
-    });
+    };
+    if (this.webrtc) o.webrtc = this.webrtc;
+    if (this.waiter) o.waiter = this.waiter;
+    this.api = new UnifiAPI(o);
     this._qqq = {
         openWebRtcAsCalled: []
     };
@@ -100,7 +103,10 @@ CloudAPI.prototype.openWebRtcAsCalled = function(deviceId) {
                 let stunUri = data.uris.filter((n) => n.match(/^stun/)).shift();
                 let turnUri = data.uris.filter((n) => n.match(/^turn/)).shift();
                 debug('WEBRTC_WS_SENDING');
-                this.wrtc = new wrtc({ debug: this.debug });
+                let o = { debug: this.debug };
+                if (this.webrtc) o.webrtc = this.webrtc;
+                if (this.waiter) o.waiter = this.waiter;
+                this.wrtc = new wrtc(o);
                 this.wrtc.RTCPeerConnection({
                     iceServers: [{
                             urls: stunUri,
