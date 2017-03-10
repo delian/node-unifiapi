@@ -369,6 +369,34 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
     }, {}, undefined, site);
 };
 
+UnifiAPI.prototype.get_settings = function(site = undefined) {
+    return this.netsite('/get/setting', undefined, {}, undefined, site);
+};
+
+UnifiAPI.prototype.get_settings_by_key = function(key, site = undefined) {
+    return new Promise((resolve, reject) => {
+        this.get_settings(site)
+            .then((data) => {
+                data.data = data.data.filter(n => n.key == key);
+                resolve(data);
+            })
+            .catch(reject);
+    });
+};
+
+UnifiAPI.prototype.set_settings = function(key, obj, site = undefined) {
+    return new Promise((resolve, reject) => {
+        this.get_settings_by_key(key, site)
+            .then((data) => {
+                if (data.data.length < 1) return reject({ msg: 'No such key', meta: { rc: 'error' } });
+                let o = merge(true, data.data[0], obj);
+                return this.netsite('/set/setting/' + o.key + '/' + o._id, o, {}, undefined, site);
+            })
+            .then(resolve)
+            .catch(reject);
+    });
+};
+
 UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id, site = undefined) {
     let o = merge({}, {
         _id: guest_id || obj._id,
