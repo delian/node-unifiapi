@@ -608,6 +608,10 @@ UnifiAPI.prototype.set_hotspot2 = function(hs_id = '', name = undefined, network
     }, {}, 'PUT', site);
 };
 
+UnifiAPI.prototype.remove_wlanconf = function(id, site = undefined) {
+    return this.netsite('/rest/wlanconf/' + id, undefined, {}, 'DELETE', site);
+};
+
 UnifiAPI.prototype.add_wlanconf = function(name, is_guest = true, usergroup_id = undefined, wlangroup_id = undefined,
     security = 'open', enabled = true, dtim_mode = 'default',
     dtim_na = 1, dtim_ng = 1, mac_filter_enabled = false, mac_filter_list = [], mac_filter_policy = 'deny',
