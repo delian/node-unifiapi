@@ -102,6 +102,17 @@ The main class and the initialization of the Unifi Access
 | options.debug | <code>boolean</code> | if the debug log is enabled |
 | options.debugNet | <code>boolean</code> | if the debug of the request module is enabled |
 
+**Example**  
+```js
+let UnifiAPI = require('node-unifiapi');
+let unifi = UnifiAPI({
+   baseUrl: 'https://127.0.0.1:8443', // The URL of the Unifi Controller
+   username: 'ubnt',
+   password: 'ubnt',
+   // debug: true, // More debug of the API (uses the debug module)
+   // debugNet: true // Debug of the network requests (uses request module)
+});
+```
 
 * [UnifiAPI(options)](#UnifiAPI) ⇒
     * [.login(username, password)](#UnifiAPI+login) ⇒ <code>Promise</code>
@@ -195,7 +206,7 @@ Kick a client (station) of the network. This will disconnect a wireless user if 
 | Param | Type | Description |
 | --- | --- | --- |
 | mac | <code>string</code> | Mac address |
-| site | <code>string</code> | Ubiquiti site if different than default |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
 
 **Example**  
 ```js

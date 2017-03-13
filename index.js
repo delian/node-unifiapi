@@ -23,6 +23,14 @@ let defaultOptions = {
  * @param {boolean} options.debug if the debug log is enabled
  * @param {boolean} options.debugNet if the debug of the request module is enabled
  * @returns this
+ * @example let UnifiAPI = require('node-unifiapi');
+ * let unifi = UnifiAPI({
+ *    baseUrl: 'https://127.0.0.1:8443', // The URL of the Unifi Controller
+ *    username: 'ubnt',
+ *    password: 'ubnt',
+ *    // debug: true, // More debug of the API (uses the debug module)
+ *    // debugNet: true // Debug of the network requests (uses request module)
+ * });
  */
 function UnifiAPI(options) {
     if (!(this instanceof UnifiAPI)) return new UnifiAPI(options)
@@ -111,7 +119,7 @@ UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
 /**
  * Kick a client (station) of the network. This will disconnect a wireless user if it is connected
  * @param {string} mac Mac address
- * @param {string} site Ubiquiti site if different than default
+ * @param {string} site Ubiquiti site, if different from default - optional
  * @return {Promise} Promise
  * @example unifi.kick_sta('00:00:11:22:33:44')
  *     .then(done => console.log('Success', done))
@@ -121,8 +129,8 @@ UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'kick_sta',
         mac: mac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.terminate_guest = function(id = '', site = undefined) {
     return this.netsite('/cmd/hotspot', {
