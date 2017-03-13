@@ -11,8 +11,19 @@ let defaultOptions = {
     'debugNet': false,
     'gzip': true,
     'site': 'default'
-}
+};
 
+/**
+ * The main class and the initialization of the Unifi Access
+ * @param {object} options the options during initialization
+ * @param {string} options.baseUrl the URL where the Unifi controller is. Default https://127.0.0.1:8443
+ * @param {string} options.username default username
+ * @param {string} options.password default password
+ * @param {string} options.site default site. Default is "default"
+ * @param {boolean} options.debug if the debug log is enabled
+ * @param {boolean} options.debugNet if the debug of the request module is enabled
+ * @returns this
+ */
 function UnifiAPI(options) {
     if (!(this instanceof UnifiAPI)) return new UnifiAPI(options)
     merge(this, defaultOptions, options)
@@ -55,6 +66,16 @@ UnifiAPI.prototype.logout = function() {
     return this.net.logout()
 };
 
+/**
+ * Authorize guest by a MAC address
+ * @param {string} mac mac address of the guest - mandatory
+ * @param {string} minutes minutes for the authorization - optional, default 60 min
+ * @param {string} up upstream bandwidth in Kbps. Default no limit
+ * @param {string} down downstream bandwidth in Kbps. Default no _limit
+ * @param {string} mbytes download limit in Mbytes. Default no limit
+ * @param {string} apmac to which mac address the authorization belongs. Default any
+ * @param {string} site to which site (Ubiquiti) the command will be applied if it is different than the default
+ */
 UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'authorize_guest',
