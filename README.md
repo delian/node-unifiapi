@@ -1,2 +1,84 @@
 # node-unifiapi
 UniFi API ported to Node.JS
+
+This library is a rewrite of the PHP based UniFi-API-Browser rewritten in JavaScript for Node-JS.
+
+It is mimicking the UniFi-API-Browser API calls (the same commands the same effects) for Ubiquiti Unifi Controller versions 4 and 5.
+
+## Major features
+
+* Implements the major (if not all) calls to the REST API of the Ubiquiti for Unifi Controller
+* Supports WebRTC (over the Ubiquiti Unifi Cloud) protocol. If you have your devices registerred in the Unifi Cloud you can access them and execute the same REST API calls over WebRTC
+* Supports SSH access to the devices that support it (mostly UAP) over WebRTC
+
+## Warning
+Quite unstable mostly due to the instability of the WebRTC implementation in Node.JS.
+Also highly uncompleted. Any help welcomed!
+
+## Installation
+To install run:
+
+    npm install node-unifiapi --save
+
+The installation depends on the Node's wrtc module. Therefore the instalation requirements are the same as for the [node-webrtc](https://github.com/js-platform/node-webrtc). Please consult with the installation requirements of this module in order to be able to install node-unifiapi.
+
+### XOpenDisplay Error
+A frequent error caused by node-webrtc module is the one defined in issue [#281](https://github.com/js-platform/node-webrtc/issues/281)
+
+    node: symbol lookup error: [local-path]/build/wrtc/v0.0.61/Release/node-v47-linux-x64/wrtc.node: undefined symbol: XOpenDisplay
+
+It happens mostly on Linux, almost exquisively if the Linux have X11 subsystem, although it is not caused directly by it (but a bad linking).
+The easiest method to avoid it is to use non desktop (non X11 based) Linux distribution, like Ubuntu Server. We all hope that in version 0.0.62 of the node-webrtc module this issue will be fixed.
+
+## Usage
+
+All the API is based on Promises
+
+### Direct access to Ubiquiti Unifi Controller
+If you have a direct access to Ubiquiti Unifi Controller, you could use the following API:
+
+    let unifi = require('node-unifiapi');
+    let r = unifi({
+        baseUrl: 'https://127.0.0.1:8443', // The URL of the Unifi Controller
+        username: 'ubnt',
+        password: 'ubnt',
+        // debug: true, // More debug of the API (uses the debug module)
+        // debugNet: true // Debug of the network requests (uses request module)
+    });
+    r.stat_sessions()
+        .then((data) => {
+            console.log('Stat sessions', data);
+            return r.stat_allusers();
+        })
+        .then((data) => {
+            console.log('AP data', data);
+        })
+        .catch((err) => {
+            console.log('Error', err);
+        })
+
+### Access via Unifi Cloud and WebRTC
+If you have to access the Unifi Controller if it is behind NAT and you need to use WebRTC to access it or known only via Unifi Cloud:
+
+    let cloud = require('node-unifiapi/cloudapi');
+    let r = cloud({
+        deviceId: '801bb78e12c80000000001a22aea000000000203c905000000066660aaaa', // The cloud id of the device
+        username: 'clouduser',
+        password: 'cloudpass',
+        // debug: true, // More debug of the API (uses the debug module)
+        // debugNet: true // Debug of the network requests
+    });
+    r.api.stat_sessions()
+        .then((data) => {
+            console.log('Stat sessions', data);
+            return r.api.stat_allusers();
+        })
+        .then((data) => {
+            console.log('AP data', data);
+        })
+        .catch((err) => {
+            console.log('Error', err);
+        })
+
+Be careful - when we use the cloud access all the Unifi calls are available under the .api property, to not confuse with the API calls that are related to the cloud management itself.
+
