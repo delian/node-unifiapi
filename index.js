@@ -37,9 +37,9 @@ function UnifiAPI(options) {
     merge(this, defaultOptions, options);
     if (this.debug) debug.enabled = true;
     if (typeof this.net === 'undefined') {
-        this.net = new UnifiRequest(merge(true, defaultOptions, options))
+        this.net = new UnifiRequest(merge(true, defaultOptions, options));
     }
-    debug('UnifiAPI Initialized with options %o', options)
+    debug('UnifiAPI Initialized with options %o', options);
 }
 
 UnifiAPI.prototype.netsite = function(url = '', jsonParams = undefined, headers = {}, method = undefined, site = undefined) {
@@ -132,12 +132,21 @@ UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
     }, {}, undefined, site);
 };
 
+/**
+ * Terminate access of a Guest (logged in via Guest Authorization). It kicks it out of the wireless and authroization
+ * @param {string} id the ID of the guest that have to be kicked out
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.terminate_guest('aa01af0133d334d77d')
+ *     .this(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 UnifiAPI.prototype.terminate_guest = function(id = '', site = undefined) {
     return this.netsite('/cmd/hotspot', {
         _id: id,
         cmd: 'terminate'
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.block_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {

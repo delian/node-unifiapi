@@ -120,6 +120,7 @@ let unifi = UnifiAPI({
     * [.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)](#UnifiAPI+authorize_guest) ⇒ <code>Promise</code>
     * [.unauthorize_guest(mac, site)](#UnifiAPI+unauthorize_guest) ⇒ <code>Promise</code>
     * [.kick_sta(mac, site)](#UnifiAPI+kick_sta) ⇒ <code>Promise</code>
+    * [.terminate_guest(id, site)](#UnifiAPI+terminate_guest) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -212,5 +213,24 @@ Kick a client (station) of the network. This will disconnect a wireless user if 
 ```js
 unifi.kick_sta('00:00:11:22:33:44')
     .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
+<a name="UnifiAPI+terminate_guest"></a>
+
+### unifiAPI.terminate_guest(id, site) ⇒ <code>Promise</code>
+Terminate access of a Guest (logged in via Guest Authorization). It kicks it out of the wireless and authroization
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>string</code> | the ID of the guest that have to be kicked out |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.terminate_guest('aa01af0133d334d77d')
+    .this(done => console.log('Success', done))
     .catch(err => console.log('Error', err))
 ```
