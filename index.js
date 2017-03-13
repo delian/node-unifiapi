@@ -26,8 +26,8 @@ let defaultOptions = {
  */
 function UnifiAPI(options) {
     if (!(this instanceof UnifiAPI)) return new UnifiAPI(options)
-    merge(this, defaultOptions, options)
-    if (this.debug) debug.enabled = true
+    merge(this, defaultOptions, options);
+    if (this.debug) debug.enabled = true;
     if (typeof this.net === 'undefined') {
         this.net = new UnifiRequest(merge(true, defaultOptions, options))
     }
@@ -35,10 +35,10 @@ function UnifiAPI(options) {
 }
 
 UnifiAPI.prototype.netsite = function(url = '', jsonParams = undefined, headers = {}, method = undefined, site = undefined) {
-    site = site || this.site
+    site = site || this.site;
     if (typeof method === 'undefined') {
-        if (typeof jsonParams === 'undefined') method = 'GET'
-        else method = 'POST'
+        if (typeof jsonParams === 'undefined') method = 'GET';
+        else method = 'POST';
     }
     return this.net.req('/api/s/' + site + url, jsonParams, headers, method)
 };
@@ -53,7 +53,7 @@ UnifiAPI.prototype.netsite = function(url = '', jsonParams = undefined, headers 
  *     .catch((err) => console.log('Error', err))
  */
 UnifiAPI.prototype.login = function(username, password) {
-    return this.net.login(username, password)
+    return this.net.login(username, password);
 };
 
 /**
@@ -63,7 +63,7 @@ UnifiAPI.prototype.login = function(username, password) {
  *     .catch((err) => console.log('Error', err))
  */
 UnifiAPI.prototype.logout = function() {
-    return this.net.logout()
+    return this.net.logout();
 };
 
 /**
@@ -75,6 +75,10 @@ UnifiAPI.prototype.logout = function() {
  * @param {string} mbytes download limit in Mbytes. Default no limit
  * @param {string} apmac to which mac address the authorization belongs. Default any
  * @param {string} site to which site (Ubiquiti) the command will be applied if it is different than the default
+ * @return {Promise} Promise
+ * @example unifi.authorize_guest('01:02:aa:bb:cc')
+ *     .then((data) => console.log('Successful authorization'))
+ *     .catch((err) => console.log('Error', err))
  */
 UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
     return this.netsite('/cmd/stamgr', {
@@ -85,16 +89,34 @@ UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undef
         down: down,
         bytes: mbytes,
         ap_mac: apmac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * De-authorize guest by a MAC address
+ * @param {string} mac the mac address
+ * @param {site} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.unauthorize_guest('00:01:02:03:aa:bb')
+ *     .then((done) => console.log('Success', done))
+ *     .catch((err) => console.log('Error', err))
+ */
 UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'uauthorize_guest',
         mac: mac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Kick a client (station) of the network. This will disconnect a wireless user if it is connected
+ * @param {string} mac Mac address
+ * @param {string} site Ubiquiti site if different than default
+ * @return {Promise} Promise
+ * @example unifi.kick_sta('00:00:11:22:33:44')
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'kick_sta',

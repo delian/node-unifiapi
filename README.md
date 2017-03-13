@@ -106,7 +106,9 @@ The main class and the initialization of the Unifi Access
 * [UnifiAPI(options)](#UnifiAPI) ⇒
     * [.login(username, password)](#UnifiAPI+login) ⇒ <code>Promise</code>
     * [.logout()](#UnifiAPI+logout)
-    * [.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)](#UnifiAPI+authorize_guest)
+    * [.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)](#UnifiAPI+authorize_guest) ⇒ <code>Promise</code>
+    * [.unauthorize_guest(mac, site)](#UnifiAPI+unauthorize_guest) ⇒ <code>Promise</code>
+    * [.kick_sta(mac, site)](#UnifiAPI+kick_sta) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -141,10 +143,11 @@ unifi.logout()
 ```
 <a name="UnifiAPI+authorize_guest"></a>
 
-### unifiAPI.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)
+### unifiAPI.authorize_guest(mac, minutes, up, down, mbytes, apmac, site) ⇒ <code>Promise</code>
 Authorize guest by a MAC address
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -156,3 +159,47 @@ Authorize guest by a MAC address
 | apmac | <code>string</code> | to which mac address the authorization belongs. Default any |
 | site | <code>string</code> | to which site (Ubiquiti) the command will be applied if it is different than the default |
 
+**Example**  
+```js
+unifi.authorize_guest('01:02:aa:bb:cc')
+    .then((data) => console.log('Successful authorization'))
+    .catch((err) => console.log('Error', err))
+```
+<a name="UnifiAPI+unauthorize_guest"></a>
+
+### unifiAPI.unauthorize_guest(mac, site) ⇒ <code>Promise</code>
+De-authorize guest by a MAC address
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | the mac address |
+| site | <code>site</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.unauthorize_guest('00:01:02:03:aa:bb')
+    .then((done) => console.log('Success', done))
+    .catch((err) => console.log('Error', err))
+```
+<a name="UnifiAPI+kick_sta"></a>
+
+### unifiAPI.kick_sta(mac, site) ⇒ <code>Promise</code>
+Kick a client (station) of the network. This will disconnect a wireless user if it is connected
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| site | <code>string</code> | Ubiquiti site if different than default |
+
+**Example**  
+```js
+unifi.kick_sta('00:00:11:22:33:44')
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
