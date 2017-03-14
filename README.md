@@ -124,6 +124,12 @@ let unifi = UnifiAPI({
     * [.block_sta(mac, site)](#UnifiAPI+block_sta) ⇒ <code>Promise</code>
     * [.unblock_sta(mac, site)](#UnifiAPI+unblock_sta) ⇒ <code>Promise</code>
     * [.set_sta_note(user, note, site)](#UnifiAPI+set_sta_note) ⇒ <code>Promise</code>
+    * [.set_sta_name(user, name, site)](#UnifiAPI+set_sta_name) ⇒ <code>Promise</code>
+    * [.stat_sessions(start, end, site)](#UnifiAPI+stat_sessions) ⇒ <code>Promise</code>
+    * [.stat_daily_site(start, end, site)](#UnifiAPI+stat_daily_site) ⇒ <code>Promise</code>
+    * [.stat_hourly_site(start, end, site)](#UnifiAPI+stat_hourly_site) ⇒ <code>Promise</code>
+    * [.stat_hourly_ap(start, end, site)](#UnifiAPI+stat_hourly_ap) ⇒ <code>Promise</code>
+    * [.stat_sta_sessions_latest(mac, limit, sort, site)](#UnifiAPI+stat_sta_sessions_latest) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -299,5 +305,132 @@ unifi.set_sta_note('aabbaa0102aa03aa3322','Test note')
 ```js
 unifi.set_sta_note('aabbaa0102aa03aa3322','') // remove note
     .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_sta_name"></a>
+
+### unifiAPI.set_sta_name(user, name, site) ⇒ <code>Promise</code>
+Set or remove Name to a station
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| user | <code>string</code> | User ID |
+| name | <code>string</code> | Name |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_sta_name('aabbaa0102aa03aa3322','Central Access Point')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+**Example**  
+```js
+unifi.set_sta_name('aabbaa0102aa03aa3322','') // remove name
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_sessions"></a>
+
+### unifiAPI.stat_sessions(start, end, site) ⇒ <code>Promise</code>
+List client sessions
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
+| end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_sessions()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_daily_site"></a>
+
+### unifiAPI.stat_daily_site(start, end, site) ⇒ <code>Promise</code>
+List daily site statistics
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
+| end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_daily_site()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_hourly_site"></a>
+
+### unifiAPI.stat_hourly_site(start, end, site) ⇒ <code>Promise</code>
+List hourly site statistics
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
+| end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_hourly_site()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_hourly_ap"></a>
+
+### unifiAPI.stat_hourly_ap(start, end, site) ⇒ <code>Promise</code>
+List hourly site statistics for ap
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
+| end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_hourly_ap()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_sta_sessions_latest"></a>
+
+### unifiAPI.stat_sta_sessions_latest(mac, limit, sort, site) ⇒ <code>Promise</code>
+Last station sessions
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| limit | <code>number</code> | How many sessions. Optional. Default 5 |
+| sort | <code>string</code> | Sorting. Optional. Default Ascending (asc) |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_sta_sessions_latest('00:01:02:03:04:05', 10)
+    .then(done => console.log('Success', done))
     .catch(err => console.log('Error',err))
 ```

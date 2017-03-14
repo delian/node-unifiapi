@@ -200,20 +200,53 @@ UnifiAPI.prototype.set_sta_note = function(user = '', note = '', site = undefine
     }, {}, undefined, site);
 };
 
+/**
+ * Set or remove Name to a station
+ * @param {string} user User ID
+ * @param {string} name Name
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_sta_name('aabbaa0102aa03aa3322','Central Access Point')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ * @example unifi.set_sta_name('aabbaa0102aa03aa3322','') // remove name
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_sta_name = function(user = '', name = '', site = undefined) {
     return this.netsite('/upd/user/' + user, {
         name: name
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List client sessions
+ * @param {number} start Start time in Unix Timestamp - Optional. Default 7 days ago
+ * @param {number} end End time in Unix timestamp - Optional. Default - now
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_sessions()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_sessions = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/sessions', {
         type: 'all',
         start: start || (new Date()).getTime() / 1000 - 7 * 24 * 3600 * 1000,
         end: end || (new Date()).getTime()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List daily site statistics
+ * @param {number} start Start time in Unix Timestamp - Optional. Default 7 days ago
+ * @param {number} end End time in Unix timestamp - Optional. Default - now
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_daily_site()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/daily.site', {
         start: start ? start : (new Date()).getTime() - 52 * 7 * 24 * 3600 * 1000,
@@ -222,9 +255,19 @@ UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined
             'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes',
             'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time'
         ]
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List hourly site statistics
+ * @param {number} start Start time in Unix Timestamp - Optional. Default 7 days ago
+ * @param {number} end End time in Unix timestamp - Optional. Default - now
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_hourly_site()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/hourly.site', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
@@ -233,9 +276,19 @@ UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefine
             'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta',
             'time'
         ]
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List hourly site statistics for ap
+ * @param {number} start Start time in Unix Timestamp - Optional. Default 7 days ago
+ * @param {number} end End time in Unix timestamp - Optional. Default - now
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_hourly_ap()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/report/hourly.ap', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
@@ -243,23 +296,35 @@ UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined,
         attrs: [
             'bytes', 'num_sta', 'time'
         ]
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Last station sessions
+ * @param {string} mac Mac address
+ * @param {number} limit How many sessions. Optional. Default 5
+ * @param {string} sort Sorting. Optional. Default Ascending (asc)
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_sta_sessions_latest('00:01:02:03:04:05', 10)
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_sta_sessions_latest = function(mac = '', limit = 5, sort = '-asoc-time', site = undefined) {
     return this.netsite('/stat/sessions', {
         mac: mac.toLowerCase(),
         '_limit': limit,
         '_sort': sort
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
+
 
 UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/authorization', {
         end: end || (new Date()).getTime(),
         start: start || (new Date()).getTime() - 7 * 24 * 3600000
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, site = undefined) {
     return this.netsite('/stat/alluser', {
