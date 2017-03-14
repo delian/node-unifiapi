@@ -652,6 +652,14 @@ UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = ''
     }, {}, undefined, site);
 };
 
+/**
+ * List all of the hotspots (v1)
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_hotspot()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_hotspot = function(site = undefined) {
     return this.netsite('/list/hotspotop', undefined, {}, undefined, site);
 };
