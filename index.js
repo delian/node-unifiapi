@@ -148,26 +148,57 @@ UnifiAPI.prototype.terminate_guest = function(id = '', site = undefined) {
     }, {}, undefined, site);
 };
 
+/**
+ * Block station of the network
+ * @param {string} mac Mac address
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.block_sta('00:01:02:03:04:05')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error', err))
+ */
 UnifiAPI.prototype.block_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'block-sta',
         mac: mac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Unblock station of the network
+ * @param {string} mac Mac address
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.block_sta('00:01:02:03:04:05')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error', err))
+ */
 UnifiAPI.prototype.unblock_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
         cmd: 'unblock-sta',
         mac: mac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Set or remove Note to a station
+ * @param {string} user User ID
+ * @param {string} note Note
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_sta_note('aabbaa0102aa03aa3322','Test note')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ * @example unifi.set_sta_note('aabbaa0102aa03aa3322','') // remove note
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_sta_note = function(user = '', note = '', site = undefined) {
     return this.netsite('/upd/user/' + user, {
         note: note,
         noted: note ? true : false
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.set_sta_name = function(user = '', name = '', site = undefined) {
     return this.netsite('/upd/user/' + user, {

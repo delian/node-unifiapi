@@ -21,9 +21,11 @@
     "url": "https://github.com/delian/node-unifiapi/issues"
   },
   "homepage": "https://github.com/delian/node-unifiapi#readme",
+  "devDependencies": {
+    "jsdoc-to-markdown": "^3.0.0"
+  },
   "dependencies": {
     "debug": "^2.6.0",
-    "json-to-markdown": "^1.0.3",
     "merge": "^1.2.0",
     "paco": "^0.4.0",
     "request": "^2.79.0",

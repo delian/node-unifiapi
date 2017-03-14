@@ -121,6 +121,9 @@ let unifi = UnifiAPI({
     * [.unauthorize_guest(mac, site)](#UnifiAPI+unauthorize_guest) ⇒ <code>Promise</code>
     * [.kick_sta(mac, site)](#UnifiAPI+kick_sta) ⇒ <code>Promise</code>
     * [.terminate_guest(id, site)](#UnifiAPI+terminate_guest) ⇒ <code>Promise</code>
+    * [.block_sta(mac, site)](#UnifiAPI+block_sta) ⇒ <code>Promise</code>
+    * [.unblock_sta(mac, site)](#UnifiAPI+unblock_sta) ⇒ <code>Promise</code>
+    * [.set_sta_note(user, note, site)](#UnifiAPI+set_sta_note) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -233,4 +236,68 @@ Terminate access of a Guest (logged in via Guest Authorization). It kicks it out
 unifi.terminate_guest('aa01af0133d334d77d')
     .this(done => console.log('Success', done))
     .catch(err => console.log('Error', err))
+```
+<a name="UnifiAPI+block_sta"></a>
+
+### unifiAPI.block_sta(mac, site) ⇒ <code>Promise</code>
+Block station of the network
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.block_sta('00:01:02:03:04:05')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error', err))
+```
+<a name="UnifiAPI+unblock_sta"></a>
+
+### unifiAPI.unblock_sta(mac, site) ⇒ <code>Promise</code>
+Unblock station of the network
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.block_sta('00:01:02:03:04:05')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error', err))
+```
+<a name="UnifiAPI+set_sta_note"></a>
+
+### unifiAPI.set_sta_note(user, note, site) ⇒ <code>Promise</code>
+Set or remove Note to a station
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| user | <code>string</code> | User ID |
+| note | <code>string</code> | Note |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_sta_note('aabbaa0102aa03aa3322','Test note')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+**Example**  
+```js
+unifi.set_sta_note('aabbaa0102aa03aa3322','') // remove note
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
 ```
