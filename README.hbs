@@ -1,15 +1,16 @@
 # node-unifiapi
 UniFi API ported to Node.JS
 
-This library is a rewrite of the PHP based UniFi-API-Browser rewritten in JavaScript for Node-JS.
+This library is a rewrite of the PHP based UniFi-API-Browser written in JavaScript for Node-JS.
 
-It is mimicking the UniFi-API-Browser API calls (the same commands the same effects) for Ubiquiti Unifi Controller versions 4 and 5.
+It is mimicking the UniFi-API-Browser API calls (the same commands the same effects) for Ubiquiti Unifi Controller versions 4 and 5 with addition of few more generic calls.
 
 ## Major features
 
 * Implements the major (if not all) calls to the REST API of the Ubiquiti for Unifi Controller
 * Supports WebRTC (over the Ubiquiti Unifi Cloud) protocol. If you have your devices registerred in the Unifi Cloud you can access them and execute the same REST API calls over WebRTC
 * Supports SSH access to the devices that support it (mostly UAP) over WebRTC
+* Supports Plug-in replacement for the WebRTC module (tested with electron-webrtc) in case wrtc doesn't work for you for some reason
 
 ## Warning
 Quite unstable mostly due to the instability of the WebRTC implementation in Node.JS.
