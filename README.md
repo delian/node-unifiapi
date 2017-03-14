@@ -152,6 +152,9 @@ let unifi = UnifiAPI({
     * [.stat_sysinfo(site)](#UnifiAPI+stat_sysinfo) ⇒ <code>Promise</code>
     * [.list_self(site)](#UnifiAPI+list_self) ⇒ <code>Promise</code>
     * [.list_networkconf(site)](#UnifiAPI+list_networkconf) ⇒ <code>Promise</code>
+    * [.stat_voucher(createtime, site)](#UnifiAPI+stat_voucher) ⇒ <code>Promise</code>
+    * [.stat_payment(within, site)](#UnifiAPI+stat_payment) ⇒ <code>Promise</code>
+    * [.create_hotspot(name, password, note, site)](#UnifiAPI+create_hotspot) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -835,6 +838,69 @@ Get information aboult the network configuration
 **Example**  
 ```js
 unifi.list_networkconf()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_voucher"></a>
+
+### unifiAPI.stat_voucher(createtime, site) ⇒ <code>Promise</code>
+Get accounting / status of the vouchers
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| createtime | <code>number</code> | Unixtimestamp since when we return information about the vouchers. Optional. Default any |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_voucher()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_payment"></a>
+
+### unifiAPI.stat_payment(within, site) ⇒ <code>Promise</code>
+Get accounting / status of the payments
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| within | <code>number</code> | how many hours back we query. Optional. Default any |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_payment()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+create_hotspot"></a>
+
+### unifiAPI.create_hotspot(name, password, note, site) ⇒ <code>Promise</code>
+Create HotSpot (version 1)
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Todo**
+
+- [ ] It is not tested and it is not working yet
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name |
+| password | <code>string</code> | password |
+| note | <code>string</code> | Note (optional) |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.create_hotspot('myhotspot', 'password', 'note')
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```

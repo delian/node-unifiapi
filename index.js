@@ -599,32 +599,62 @@ UnifiAPI.prototype.list_self = function(site = undefined) { // TODO: test
  *     .catch(err => console.log('Error',err))
  */
 UnifiAPI.prototype.list_networkconf = function(site = undefined) {
-    return this.netsite('/list/networkconf', undefined, {}, undefined, site)
+    return this.netsite('/list/networkconf', undefined, {}, undefined, site);
 };
 
+/**
+ * Get accounting / status of the vouchers
+ * @param {number} createtime Unixtimestamp since when we return information about the vouchers. Optional. Default any
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_voucher()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_voucher = function(createtime = undefined, site = undefined) {
     return this.netsite('/stat/voucher', {
         create_time: createtime
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Get accounting / status of the payments
+ * @param {number} within how many hours back we query. Optional. Default any
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_payment()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_payment = function(within = undefined, site = undefined) {
     return this.netsite('/stat/payment', { // TODO: test it, is it payment or voucher
         within: within
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Create HotSpot (version 1)
+ * @todo It is not tested and it is not working yet
+ * @param {string} name name
+ * @param {string} password password
+ * @param {string} note Note (optional)
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.create_hotspot('myhotspot', 'password', 'note')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.create_hotspot = function(name = '', password = '', note = '', site = undefined) {
     return this.netsite('/stat/voucher', {
         name: name,
         note: note,
         x_password: password
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.list_hotspot = function(site = undefined) {
-    return this.netsite('/list/hotspotop', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/hotspotop', undefined, {}, undefined, site);
+};
 
 UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
     return this.netsite('/cmd/hotspot', {
@@ -636,8 +666,8 @@ UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0,
         expire: minutes,
         n: count,
         quota: quota
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.revoke_voucher = function(voucher_id, site = undefined) {
     return this.netsite('/cmd/hotspot', {
