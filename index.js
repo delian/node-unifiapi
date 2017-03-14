@@ -1223,6 +1223,21 @@ UnifiAPI.prototype.status = function(site = undefined) {
     return this.net.req('/status', undefined, {}, undefined, site);
 };
 
+/**
+ * Configure the network settings of AP/device
+ * @param {string} ap_id ID of the AP
+ * @param {string} type static or dhcp. Optional. Default dhcp
+ * @param {string} ip IP address. Optional
+ * @param {string} netmask netmask. Optional
+ * @param {string} gateway gateway. Optional
+ * @param {string} dns1 dns. Optional
+ * @param {string} dns2 dns. Optional
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_ap_network('00:01:02:03:04:05', 'dhcp')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_ap_network = function(ap_id = '', type = 'dhcp', ip = '192.168.1.6', netmask = '255.255.255.0', gateway = '192.168.1.1', dns1 = '8.8.8.8', dns2 = '8.8.4.4', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         'config_network': [{
@@ -1236,6 +1251,15 @@ UnifiAPI.prototype.set_ap_network = function(ap_id = '', type = 'dhcp', ip = '19
     }, {}, 'PUT', site);
 };
 
+/**
+ * Request a spectrum scan
+ * @param {string} mac Mac of the AP
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.request_spectrumscan('00:01:02:03:04:05')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.request_spectrumscan = function(mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         cmd: 'spectrum-scan',
@@ -1243,6 +1267,15 @@ UnifiAPI.prototype.request_spectrumscan = function(mac = '', site = undefined) {
     }, {}, undefined, site);
 };
 
+/**
+ * Set description to the site
+ * @param {string} description description
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_site_descr('My site')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_site_descr = function(description = '', site = undefined) {
     return this.netsite('/cmd/sitemgr', {
         cmd: 'update-site',
@@ -1250,6 +1283,24 @@ UnifiAPI.prototype.set_site_descr = function(description = '', site = undefined)
     }, {}, undefined, site);
 };
 
+/**
+ * Set settings of the site (optional)
+ * @todo To be tested and completed
+ * @param {string} gen_id The id of the settings
+ * @param {string} site_id The id of the site
+ * @param {boolean} advanced advanced options enabled. Optional. default true
+ * @param {boolean} alerts alerts enabled. Optional. default true
+ * @param {boolean} auto_upgrade auto upgrade of the AP enabled. Optional. default true
+ * @param {string} key always mgmt. Optional. default mgmt
+ * @param {boolean} led_enabled Led enabled. Optional. default true
+ * @param {string} x_ssh_username SSH username. Optional. Default ubnt
+ * @param {string} x_ssh_password SSH password. Optional. Default ubnt
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_site_settings('0101923920a3a4fbff', '3333923920a3a4fbff', false)
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_site_settings = function(gen_id = '', site_id = '', advanced = true, alerts = true, auto_upgrade = true, key = 'mgmt', led_enabled = true, x_ssh_username = 'ubnt', x_ssh_password = 'ubnt', x_ssh_md5passwd = '$1$PiGDOzRF$GX49UVoQSqwaLgXu/Cuvb/', site = undefined) {
     return this.netsite('/set/setting/mgmt/' + gen_id, {
         '_id': gen_id,
@@ -1265,6 +1316,19 @@ UnifiAPI.prototype.set_site_settings = function(gen_id = '', site_id = '', advan
     }, {}, undefined, site);
 };
 
+/**
+ * Add HotSpot 2.0 configuration
+ * @param {string} name hotspot name. Default hotspot
+ * @param {string} network_access_internet Network access
+ * @param {number} network_type Network type. Optional. Default 2
+ * @param {number} venue_group Venue group. Optional. Default 2
+ * @param {number} venue_type Venue type. Optional. Default 0
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.add_hotspot2('hotspot2.0 config')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.add_hotspot2 = function(name = 'hotspot', network_access_internet = undefined, network_type = 2, venue_group = 2, venue_type = 0, site = undefined) {
     return this.netsite('/rest/hotspot2conf', {
         name: name,
@@ -1275,14 +1339,48 @@ UnifiAPI.prototype.add_hotspot2 = function(name = 'hotspot', network_access_inte
     }, {}, undefined, site);
 };
 
+/**
+ * List hotspot 2.0 configurations
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.list_hotspot2()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_hotspot2 = function(site = undefined) {
     return this.netsite('/rest/hotspot2conf', undefined, {}, undefined, site);
 };
 
+/**
+ * Delete hotspot 2.0 configuration
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.delete_hotspot2('112233445566778899aabb')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ * @example unifi.list_hotspot2()
+ *     .then(data => unifi.delete_hotspot2(data.data.shift()._id))
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.delete_hotspot2 = function(hs_id, site = undefined) {
     return this.netsite('/rest/hotspot2conf/' + hs_id, undefined, {}, 'DELETE', site);
 };
 
+/**
+ * Modify Hotspot 2.0 configuration
+ * @param {string} hs_id Hotspot2.0 config id
+ * @param {string} name name. Optional
+ * @param {string} network_access_internet Network access. Optional
+ * @param {number} network_type Network type. Optional
+ * @param {number} venue_group Venue group. Optional
+ * @param {number} venue_type Venue type. Optional
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_hotspot2('112323322aaaffa191', 'new name')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_hotspot2 = function(hs_id = '', name = undefined, network_access_internet = undefined, network_type = undefined, venue_type = undefined, venue_group = undefined, site = undefined) {
     return this.netsite('/rest/hotspot2conf/' + hs_id, {
         name: name,
@@ -1294,6 +1392,15 @@ UnifiAPI.prototype.set_hotspot2 = function(hs_id = '', name = undefined, network
     }, {}, 'PUT', site);
 };
 
+/**
+ * Remove WLAN configuration
+ * @param {string} id wlan config id
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.remove_wlanconf('112323322aaaffa191')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.remove_wlanconf = function(id, site = undefined) {
     return this.netsite('/rest/wlanconf/' + id, undefined, {}, 'DELETE', site);
 };
@@ -1343,7 +1450,17 @@ UnifiAPI.prototype.add_wlanconf = function(name, is_guest = true, usergroup_id =
     }, {}, undefined, site);
 };
 
-UnifiAPI.prototype.sdn_unregister = function(site = undefined) {
+/**
+ * Register to the SDN (Ubiquiti cloud)
+ * @param {string} username Cloud username
+ * @param {string} password Cloud password
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.sdn_register('unifi_user', 'unifi_pass')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.sdn_register = function(username, password, site = undefined) {
     return this.netsite('/cmd/sdn', {
         cmd: 'register',
         ubic_username: username,
@@ -1351,16 +1468,42 @@ UnifiAPI.prototype.sdn_unregister = function(site = undefined) {
     }, {}, undefined, site);
 };
 
-UnifiAPI.prototype.sdn_register = function(username, password, site = undefined) {
+/**
+ * Deregister of the SDN (Ubiquiti cloud)
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.sdn_unregister()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.sdn_unregister = function(site = undefined) {
     return this.netsite('/cmd/sdn', {
         cmd: 'unregister'
     }, {}, undefined, site);
 };
 
+/**
+ * Get information about the Ubiquiti cloud registration
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.sdn_stat()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.sdn_stat = function(site = undefined) {
     return this.netsite('/stat/sdn', undefined, {}, undefined, site);
 };
 
+/**
+ * SDN on, off, deregistration
+ * @param {boolean} enabled Enable SDN or disable it. Default true
+ * @param {string} site_id Site id
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.sdn_onoff(true, '00010102221adffaa03')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.sdn_onoff = function(enabled = true, site_id = '', site = undefined) {
     return this.netsite('/set/setting/super_sdn', {
         key: 'super_sdn',
@@ -1369,6 +1512,16 @@ UnifiAPI.prototype.sdn_onoff = function(enabled = true, site_id = '', site = und
     }, {}, undefined, site);
 };
 
+/**
+ * Extend voucher
+ * @todo Test it and verify that the REST url is correct
+ * @param {string} voucher_id voucher id
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.extend_voucher('00010102221adffaa03')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.extend_voucher = function(voucher_id = '', site = undefined) {
     return this.netsite('/set/setting/super_sdn', {
         cmd: 'extend',
@@ -1432,6 +1585,28 @@ UnifiAPI.prototype.closeSSHSession = function(mac, uuid, site = undefined) {
     }, {}, undefined, site);
 };
 
+/**
+ * Open SSH tunnel to a device managed by the controller (currently only Unifi AP) using WebRTC
+ * @alias SSH
+ * @param {string} mac The mac address of the AP
+ * @param {string} uuid Unique UUID of the session. Optional. Auto generated if undefined
+ * @param {string} stun Stun server url. Optional. If undefined, automatically populated
+ * @param {string} turn Turn server url. Optional. If undefined, automatically populated
+ * @param {string} username Turn username. Optional
+ * @param {string} password Turn password. Optional
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @param {number} autoclose Timeout (milisec) of inactivity before the session is automatically closed. Optional. Default 30000
+ * @param {object} webrtc Object containing initialized WebRTC module. Optional. If not specified wrtc module is used or the one set in the UnifiAPI initialization. Tested with electron-webrtc
+ * @param {number} waiter How many ms to wait before the next webrtc API call. Optionl. With wrtc is 100ms. However with electron-webrtc must be more than 1500 to avoid crashing on MAC and sometimes on Linux
+ * @return {SSHSession} Return SSHSession object with send, recv, expect, close methods
+ * @example unifi.connectSSH('00:01:02:03:04:05')
+ *     .then((ssh) => {
+ *         ssh.send('\nls -al\n');
+ *         return ssh.expect('#')
+ *     })
+ *     .then(data => console.log(data))
+ *     .catch(err => console.log('Error', err))
+ */
 UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, password, site, autoclose, webrtc, waiter) {
     return new SSHSession(this, mac, uuid, stun, turn, username, password, site, autoclose, webrtc || this.webrtc, waiter || this.waiter);
 };
