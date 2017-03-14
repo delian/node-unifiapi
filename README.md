@@ -156,6 +156,20 @@ let unifi = UnifiAPI({
     * [.stat_payment(within, site)](#UnifiAPI+stat_payment) ⇒ <code>Promise</code>
     * [.create_hotspot(name, password, note, site)](#UnifiAPI+create_hotspot) ⇒ <code>Promise</code>
     * [.list_hotspot(site)](#UnifiAPI+list_hotspot) ⇒ <code>Promise</code>
+    * [.create_voucher(count, minutes, quota, note, up, down, mbytes, site)](#UnifiAPI+create_voucher) ⇒ <code>Promise</code>
+    * [.revoke_voucher(voucher_id, site)](#UnifiAPI+revoke_voucher) ⇒ <code>Promise</code>
+    * [.list_portforwarding(site)](#UnifiAPI+list_portforwarding) ⇒ <code>Promise</code>
+    * [.list_dynamicdns(site)](#UnifiAPI+list_dynamicdns) ⇒ <code>Promise</code>
+    * [.list_portconf(site)](#UnifiAPI+list_portconf) ⇒ <code>Promise</code>
+    * [.list_extension(site)](#UnifiAPI+list_extension) ⇒ <code>Promise</code>
+    * [.list_settings(site)](#UnifiAPI+list_settings) ⇒ <code>Promise</code>
+    * [.restart_ap(mac, site)](#UnifiAPI+restart_ap) ⇒ <code>Promise</code>
+    * [.disable_ap(ap_id, disable, site)](#UnifiAPI+disable_ap) ⇒ <code>Promise</code>
+    * [.enable_ap(ap_id, disable, site)](#UnifiAPI+enable_ap) ⇒ <code>Promise</code>
+    * [.set_locate_ap(mac, site)](#UnifiAPI+set_locate_ap) ⇒ <code>Promise</code>
+    * [.unset_locate_ap(mac, site)](#UnifiAPI+unset_locate_ap) ⇒ <code>Promise</code>
+    * [.site_ledson(site)](#UnifiAPI+site_ledson) ⇒ <code>Promise</code>
+    * [.site_ledsoff(site)](#UnifiAPI+site_ledsoff) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -889,7 +903,8 @@ Create HotSpot (version 1)
 **Returns**: <code>Promise</code> - Promise  
 **Todo**
 
-- [ ] It is not tested and it is not working yet
+- [ ] Check if the URL of the rest service is correct
+- [ ] Test that it is working
 
 
 | Param | Type | Description |
@@ -920,6 +935,281 @@ List all of the hotspots (v1)
 **Example**  
 ```js
 unifi.list_hotspot()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+create_voucher"></a>
+
+### unifiAPI.create_voucher(count, minutes, quota, note, up, down, mbytes, site) ⇒ <code>Promise</code>
+Create vouchers. Generate a set of vouchers
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| count | <code>number</code> | how many vouchers to generate. Optional. default is 1 |
+| minutes | <code>number</code> | how long the voucher may be active after activation in minutes. Optional. default is 60 minutes |
+| quota | <code>number</code> | how many times a user may reuse (login with) this voucher. Default 0 = unlimited. 1 means only once. 2 means two times and so on |
+| note | <code>string</code> | the note of the voucher. Optional |
+| up | <code>number</code> | Upstream bandwidth rate limit in Kbits. Optional. Default - no limit |
+| down | <code>number</code> | Downstream bandwidth rate limit in Kbits. Optional. Default - no limit |
+| mbytes | <code>number</code> | Limit of the maximum download traffic in Mbytes. Optional. Default - no limit |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.create_voucher(10, 2880, 1, 'Test vouchers', 1000, 2000, 250)
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+revoke_voucher"></a>
+
+### unifiAPI.revoke_voucher(voucher_id, site) ⇒ <code>Promise</code>
+Revoke Voucher. Voucher revoking is the same as deleting the voucher. In most of the cases the authorized user is kicked out of the network too
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| voucher_id | <code>string</code> | description |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.revoke_voucher('9912982aaff182728a0f03')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_portforwarding"></a>
+
+### unifiAPI.list_portforwarding(site) ⇒ <code>Promise</code>
+List port forwarding configuration
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_portforwarding()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_dynamicdns"></a>
+
+### unifiAPI.list_dynamicdns(site) ⇒ <code>Promise</code>
+List dynamic dns configuration
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_dynamicdns()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_portconf"></a>
+
+### unifiAPI.list_portconf(site) ⇒ <code>Promise</code>
+List network port configuration
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Todo**
+
+- [ ] Test it
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_portconf()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_extension"></a>
+
+### unifiAPI.list_extension(site) ⇒ <code>Promise</code>
+List extensions
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Todo**
+
+- [ ] Learn more what exactly is this
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_extension()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_settings"></a>
+
+### unifiAPI.list_settings(site) ⇒ <code>Promise</code>
+Get array with all the settings refered by settings key
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_settings()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+restart_ap"></a>
+
+### unifiAPI.restart_ap(mac, site) ⇒ <code>Promise</code>
+Restart Wireless Access Point
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | mac address of the AP |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.restart_ap('00:01:02:03:aa:04')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+disable_ap"></a>
+
+### unifiAPI.disable_ap(ap_id, disable, site) ⇒ <code>Promise</code>
+Disable Wireless Access Point
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | The internal ID of the AP |
+| disable | <code>boolean</code> | Shall we disable it. Optional. Default true. If false, the AP is enabled |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.disable_ap('001fa98a00a22328123')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+enable_ap"></a>
+
+### unifiAPI.enable_ap(ap_id, disable, site) ⇒ <code>Promise</code>
+Enable Wireless Access Point
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | The internal ID of the AP |
+| disable | <code>boolean</code> | Shall we disable it. Optional. Default true. If false, the AP is enabled |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.enable_ap('001fa98a00a22328123')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_locate_ap"></a>
+
+### unifiAPI.set_locate_ap(mac, site) ⇒ <code>Promise</code>
+Locate Wireless Access Point. The Access Point will start blinking
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | mac of the AP |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_locate_ap('00:01:aa:03:04:05')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+unset_locate_ap"></a>
+
+### unifiAPI.unset_locate_ap(mac, site) ⇒ <code>Promise</code>
+Turn off Locate Wireless Access Point. The Access Point will stop blinking
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | mac of the AP |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.unset_locate_ap('00:01:aa:03:04:05')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+site_ledson"></a>
+
+### unifiAPI.site_ledson(site) ⇒ <code>Promise</code>
+All devices in the site group will start blinking
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.site_ledson()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+site_ledsoff"></a>
+
+### unifiAPI.site_ledsoff(site) ⇒ <code>Promise</code>
+All devices in the site group will stop blinking
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.site_ledsoff()
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```

@@ -634,7 +634,8 @@ UnifiAPI.prototype.stat_payment = function(within = undefined, site = undefined)
 
 /**
  * Create HotSpot (version 1)
- * @todo It is not tested and it is not working yet
+ * @todo Check if the URL of the rest service is correct
+ * @todo Test that it is working
  * @param {string} name name
  * @param {string} password password
  * @param {string} note Note (optional)
@@ -664,7 +665,22 @@ UnifiAPI.prototype.list_hotspot = function(site = undefined) {
     return this.netsite('/list/hotspotop', undefined, {}, undefined, site);
 };
 
-UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
+/**
+ * Create vouchers. Generate a set of vouchers
+ * @param {number} count how many vouchers to generate. Optional. default is 1
+ * @param {number} minutes how long the voucher may be active after activation in minutes. Optional. default is 60 minutes
+ * @param {number} quota how many times a user may reuse (login with) this voucher. Default 0 = unlimited. 1 means only once. 2 means two times and so on
+ * @param {string} note the note of the voucher. Optional
+ * @param {number} up Upstream bandwidth rate limit in Kbits. Optional. Default - no limit
+ * @param {number} down Downstream bandwidth rate limit in Kbits. Optional. Default - no limit
+ * @param {number} mbytes Limit of the maximum download traffic in Mbytes. Optional. Default - no limit
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.create_voucher(10, 2880, 1, 'Test vouchers', 1000, 2000, 250)
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.create_voucher = function(count = 1, minutes = 60, quota = 0, note = undefined, up = undefined, down = undefined, mbytes = undefined, site = undefined) {
     return this.netsite('/cmd/hotspot', {
         note: note,
         up: up,
@@ -677,75 +693,189 @@ UnifiAPI.prototype.create_voucher = function(minutes = 60, count = 1, quota = 0,
     }, {}, undefined, site);
 };
 
+/**
+ * Revoke Voucher. Voucher revoking is the same as deleting the voucher. In most of the cases the authorized user is kicked out of the network too
+ * @param {string} voucher_id description
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.revoke_voucher('9912982aaff182728a0f03')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.revoke_voucher = function(voucher_id, site = undefined) {
     return this.netsite('/cmd/hotspot', {
         cmd: 'delete-voucher',
         _id: voucher_id
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List port forwarding configuration
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_portforwarding()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_portforwarding = function(site = undefined) {
-    return this.netsite('/list/portforward', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/portforward', undefined, {}, undefined, site);
+};
 
+/**
+ * List dynamic dns configuration
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_dynamicdns()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_dynamicdns = function(site = undefined) {
-    return this.netsite('/list/dynamicdns', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/dynamicdns', undefined, {}, undefined, site);
+};
 
+/**
+ * List network port configuration
+ * @todo Test it
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_portconf()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_portconf = function(site = undefined) {
-    return this.netsite('/list/portconf', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/portconf', undefined, {}, undefined, site);
+};
 
+/**
+ * List extensions
+ * @todo Learn more what exactly is this
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_extension()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_extension = function(site = undefined) {
-    return this.netsite('/list/extension', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/extension', undefined, {}, undefined, site);
+};
 
+/**
+ * Get array with all the settings refered by settings key
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_settings()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_settings = function(site = undefined) {
     return this.netsite('/get/setting', undefined, {}, undefined, site)
-}
+};
 
+/**
+ * Restart Wireless Access Point
+ * @param {string} mac mac address of the AP
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.restart_ap('00:01:02:03:aa:04')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.restart_ap = function(mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         cmd: 'restart',
         mac: mac.toLowerCase()
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Disable Wireless Access Point
+ * @param {string} ap_id The internal ID of the AP
+ * @param {boolean} disable Shall we disable it. Optional. Default true. If false, the AP is enabled
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.disable_ap('001fa98a00a22328123')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.disable_ap = function(ap_id = '', disable = true, site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         disabled: disable
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Enable Wireless Access Point
+ * @param {string} ap_id The internal ID of the AP
+ * @param {boolean} disable Shall we disable it. Optional. Default true. If false, the AP is enabled
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.enable_ap('001fa98a00a22328123')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.enable_ap = function(ap_id = '', disable = false, site = undefined) {
-    return this.disable_ap(ap_id, disable, site)
-}
+    return this.disable_ap(ap_id, disable, site);
+};
 
+/**
+ * Locate Wireless Access Point. The Access Point will start blinking
+ * @param {string} mac mac of the AP
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_locate_ap('00:01:aa:03:04:05')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_locate_ap = function(mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         mac: mac.toLowerCase(),
         cmd: 'set-locate'
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Turn off Locate Wireless Access Point. The Access Point will stop blinking
+ * @param {string} mac mac of the AP
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.unset_locate_ap('00:01:aa:03:04:05')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.unset_locate_ap = function(mac = '', site = undefined) {
     return this.netsite('/cmd/devmgr', {
         mac: mac.toLowerCase(),
         cmd: 'unset-locate'
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * All devices in the site group will start blinking
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.site_ledson()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.site_ledson = function(site = undefined) {
     return this.netsite('/set/setting/mgmt', {
         led_enabled: true
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
-UnifiAPI.prototype.site_ledson = function(site = undefined) {
+/**
+ * All devices in the site group will stop blinking
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.site_ledsoff()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.site_ledsoff = function(site = undefined) {
     return this.netsite('/set/setting/mgmt', {
         led_enabled: false
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', channel = 1, ht = '20', tx_power_mode = 0, tx_power = 0) {
     return this.netsite('/upd/device/' + ap_id, {
@@ -754,8 +884,8 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
         ht: ht,
         tx_power_mode: tx_power_mode,
         tx_power: tx_power
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.get_settings = function(site = undefined) {
     return this.netsite('/get/setting', undefined, {}, undefined, site)
