@@ -1598,9 +1598,10 @@ UnifiAPI.prototype.closeSSHSession = function(mac, uuid, site = undefined) {
  * @param {number} autoclose Timeout (milisec) of inactivity before the session is automatically closed. Optional. Default 30000
  * @param {object} webrtc Object containing initialized WebRTC module. Optional. If not specified wrtc module is used or the one set in the UnifiAPI initialization. Tested with electron-webrtc
  * @param {number} waiter How many ms to wait before the next webrtc API call. Optionl. With wrtc is 100ms. However with electron-webrtc must be more than 1500 to avoid crashing on MAC and sometimes on Linux
- * @return {SSHSession} Return SSHSession object with send, recv, expect, close methods
- * @example unifi.connectSSH('00:01:02:03:04:05')
- *     .then((ssh) => {
+ * @return {SSHSession} Return SSHSession object with connect, send, recv, expect, close methods
+ * @example let ssh = unifi.connectSSH('00:01:02:03:04:05');
+ * ssh.connect()
+ *     .then((data) => {
  *         ssh.send('\nls -al\n');
  *         return ssh.expect('#')
  *     })
@@ -1613,7 +1614,7 @@ UnifiAPI.prototype.connectSSH = function(mac, uuid, stun, turn, username, passwo
 
 UnifiAPI.prototype.getSshTurnServers = function() {
     return new Promise((resolve, reject) => {
-        debug('Respond with stun/turn servers')
+        debug('Respond with stun/turn servers');
         resolve({
             stun: 'stun:stun.l.google.com:19302',
             turn: 'turn:numb.viagenie.ca',

@@ -19,6 +19,25 @@ let defaultOptions = {
     'site': 'default'
 };
 
+/**
+ * Cloud API interface. Under the .api method there will be all of the UnifiAPI calls (over WebRTC)
+ * @param {object} options default parameters to access Unifi Cloud
+ * @param {string} options.username Cloud username
+ * @param {string} options.password Cloud password
+ * @param {boolean} options.debug Debug the module. Optional. Default false
+ * @param {string} options.deviceId Default Device Id
+ * @param {boolean} options.gzip If gzip is enabled for the cloud messages. Optional. default true
+ * @param {object} options.webrtc Reference to WebRTC module for NodeJS. If non specified, wrtc is used. Tested with electron-webrtc
+ * @param {object} options.waiter How many ms to wait before WebRTC API call. Necessary for electron-webrtc as too fast calls crash the communication (values > 1000ms must be set for electron-webrtc)
+ * @returns CloudAPI
+ * @example let CloudAPI = require('node-unifiapi/cloudapi');
+ * let cloud = CloudAPI({ deviceId: 'aaaffaad0121212', username: 'clouduser', password: 'cloudpass'});
+ * cloud.self()
+ *     .then(() => cloud.devices())
+ *     .then(data => { console.log('Devices', data); return cloud.api.stat_sessions(); })
+ *     .then(data => console.log('Sessions', data))
+ *     .catch(err => console.log('Error', err))
+ */
 function CloudAPI(options) {
     if (!(this instanceof CloudAPI)) return new CloudAPI(options);
     merge(this, defaultOptions, options);
@@ -45,24 +64,62 @@ function CloudAPI(options) {
     debug('CloudAPI Initialized with options %o', options);
 }
 
+/**
+ * Explicit login. Optional call as implicit login is always in place
+ * @param {string} username username if different from default. 
+ * @param {string} password password if different from default. 
+ * @return {Promise} Promise
+ * @example cloud.login()
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 CloudAPI.prototype.login = function(username, password) {
     return this.net.login(username, password);
 };
 
+/**
+ * Explicit logout
+ * @return {Promise} Promise
+ * @example cloud.logout()
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 CloudAPI.prototype.logout = function() {
     this.closeWebRtc();
     return this.net.logout();
 };
 
+/**
+ * Check information about self
+ * @return {Promise} Promise
+ * @example cloud.self()
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 CloudAPI.prototype.self = function() {
     return this.net.req('/user/self');
 };
 
+/**
+ * List registered devices / controllers
+ * @return {Promise} Promise
+ * @example cloud.devices()
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 CloudAPI.prototype.devices = function() {
     return this.net.req('/devices', undefined, undefined, undefined,
         baseUrl = "https://device-airos.svc.ubnt.com/api/airos/v1/unifi");
 };
 
+/**
+ * Forget device/controller
+ * @param {string} device_id ID of the device
+ * @return {Promise} Promise
+ * @example cloud.delete_device('aa8181092821922221a')
+ *     .then(done => console.log('Success', done))
+ *     .catch(err => console.log('Error', err))
+ */
 CloudAPI.prototype.delete_device = function(device_id = '') {
     return this.net.req('/devices/' + device_id, undefined, undefined, method = 'DELETE',
         baseUrl = "https://device-airos.svc.ubnt.com/api/airos/v1/unifi");

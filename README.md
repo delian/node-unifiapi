@@ -97,6 +97,9 @@ Be careful - when we use the cloud access all the Unifi calls are available unde
 <dt><a href="#SSH">SSH(mac, uuid, stun, turn, username, password, site, autoclose, webrtc, waiter)</a> ⇒ <code>SSHSession</code></dt>
 <dd><p>Open SSH tunnel to a device managed by the controller (currently only Unifi AP) using WebRTC</p>
 </dd>
+<dt><a href="#CloudAPI">CloudAPI(options)</a> ⇒</dt>
+<dd><p>Cloud API interface. Under the .api method there will be all of the UnifiAPI calls (over WebRTC)</p>
+</dd>
 </dl>
 
 <a name="UnifiAPI"></a>
@@ -1897,7 +1900,7 @@ unifi.get_settings()
 Open SSH tunnel to a device managed by the controller (currently only Unifi AP) using WebRTC
 
 **Kind**: global function  
-**Returns**: <code>SSHSession</code> - Return SSHSession object with send, recv, expect, close methods  
+**Returns**: <code>SSHSession</code> - Return SSHSession object with connect, send, recv, expect, close methods  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1914,11 +1917,125 @@ Open SSH tunnel to a device managed by the controller (currently only Unifi AP) 
 
 **Example**  
 ```js
-unifi.connectSSH('00:01:02:03:04:05')
-    .then((ssh) => {
+let ssh = unifi.connectSSH('00:01:02:03:04:05');
+ssh.connect()
+    .then((data) => {
         ssh.send('\nls -al\n');
         return ssh.expect('#')
     })
     .then(data => console.log(data))
+    .catch(err => console.log('Error', err))
+```
+<a name="CloudAPI"></a>
+
+## CloudAPI(options) ⇒
+Cloud API interface. Under the .api method there will be all of the UnifiAPI calls (over WebRTC)
+
+**Kind**: global function  
+**Returns**: CloudAPI  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | default parameters to access Unifi Cloud |
+| options.username | <code>string</code> | Cloud username |
+| options.password | <code>string</code> | Cloud password |
+| options.debug | <code>boolean</code> | Debug the module. Optional. Default false |
+| options.deviceId | <code>string</code> | Default Device Id |
+| options.gzip | <code>boolean</code> | If gzip is enabled for the cloud messages. Optional. default true |
+| options.webrtc | <code>object</code> | Reference to WebRTC module for NodeJS. If non specified, wrtc is used. Tested with electron-webrtc |
+| options.waiter | <code>object</code> | How many ms to wait before WebRTC API call. Necessary for electron-webrtc as too fast calls crash the communication (values > 1000ms must be set for electron-webrtc) |
+
+**Example**  
+```js
+let CloudAPI = require('node-unifiapi/cloudapi');
+let cloud = CloudAPI({ deviceId: 'aaaffaad0121212', username: 'clouduser', password: 'cloudpass'});
+cloud.self()
+    .then(() => cloud.devices())
+    .then(data => { console.log('Devices', data); return cloud.api.stat_sessions(); })
+    .then(data => console.log('Sessions', data))
+    .catch(err => console.log('Error', err))
+```
+
+* [CloudAPI(options)](#CloudAPI) ⇒
+    * [.login(username, password)](#CloudAPI+login) ⇒ <code>Promise</code>
+    * [.logout()](#CloudAPI+logout) ⇒ <code>Promise</code>
+    * [.self()](#CloudAPI+self) ⇒ <code>Promise</code>
+    * [.devices()](#CloudAPI+devices) ⇒ <code>Promise</code>
+    * [.delete_device(device_id)](#CloudAPI+delete_device) ⇒ <code>Promise</code>
+
+<a name="CloudAPI+login"></a>
+
+### cloudAPI.login(username, password) ⇒ <code>Promise</code>
+Explicit login. Optional call as implicit login is always in place
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| username | <code>string</code> | username if different from default. |
+| password | <code>string</code> | password if different from default. |
+
+**Example**  
+```js
+cloud.login()
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
+<a name="CloudAPI+logout"></a>
+
+### cloudAPI.logout() ⇒ <code>Promise</code>
+Explicit logout
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Example**  
+```js
+cloud.logout()
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
+<a name="CloudAPI+self"></a>
+
+### cloudAPI.self() ⇒ <code>Promise</code>
+Check information about self
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Example**  
+```js
+cloud.self()
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
+<a name="CloudAPI+devices"></a>
+
+### cloudAPI.devices() ⇒ <code>Promise</code>
+List registered devices / controllers
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Example**  
+```js
+cloud.devices()
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
+```
+<a name="CloudAPI+delete_device"></a>
+
+### cloudAPI.delete_device(device_id) ⇒ <code>Promise</code>
+Forget device/controller
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| device_id | <code>string</code> | ID of the device |
+
+**Example**  
+```js
+cloud.delete_device('aa8181092821922221a')
+    .then(done => console.log('Success', done))
     .catch(err => console.log('Error', err))
 ```

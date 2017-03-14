@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "readme": "jsdoc2md --template README.hbs --files index.js > README.md"
+    "readme": "jsdoc2md --template README.hbs --files index.js cloudapi.js > README.md"
   },
   "repository": {
     "type": "git",
