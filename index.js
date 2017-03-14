@@ -509,40 +509,98 @@ UnifiAPI.prototype.list_sites = function() {
     return this.net.req('/api/self/sites');
 };
 
+/**
+ * Sites stats
+ * @return {Promise} Promise
+ * @example unifi.stat_sites()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_sites = function() {
-    return this.net.req('/api/stat/sites')
-}
+    return this.net.req('/api/stat/sites');
+};
 
+/**
+ * Add new site
+ * @param {string} name name
+ * @param {string} description description - optional
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.add_site('mysite','Experimental site')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.add_site = function(name = 'default', description = '', site = undefined) {
     return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'add-site',
         name: name,
         desc: description
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Remove site
+ * @param {string} name name
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.remove_site('mysite')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.remove_site = function(name = 'none', site = undefined) { // TODO: test it
     return this.netsite('/cmd/sitemgr', site = site, {
         cmd: 'remove-site',
         name: name
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List WLANGroups
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_wlan_groups()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_wlan_groups = function(site = undefined) {
-    return this.netsite('/list/wlangroup', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/wlangroup', undefined, {}, undefined, site);
+};
 
+/**
+ * Stat Sysinfo
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_sysinfo()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_sysinfo = function(site = undefined) {
-    return this.netsite('/stat/sysinfo', undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/sysinfo', undefined, {}, undefined, site);
+};
 
+/**
+ * Get information aboult self (username, etc)
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_self()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_self = function(site = undefined) { // TODO: test
-    return this.netsite('/self', undefined, {}, undefined, site)
-}
+    return this.netsite('/self', undefined, {}, undefined, site);
+};
 
+/**
+ * Get information aboult the network configuration
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_networkconf()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_networkconf = function(site = undefined) {
     return this.netsite('/list/networkconf', undefined, {}, undefined, site)
-}
+};
 
 UnifiAPI.prototype.stat_voucher = function(createtime = undefined, site = undefined) {
     return this.netsite('/stat/voucher', {

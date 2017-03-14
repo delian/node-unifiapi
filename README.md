@@ -144,6 +144,13 @@ let unifi = UnifiAPI({
     * [.list_aps(mac, site)](#UnifiAPI+list_aps) ⇒ <code>Promise</code>
     * [.list_rogueaps(within, site)](#UnifiAPI+list_rogueaps) ⇒ <code>Promise</code>
     * [.list_sites()](#UnifiAPI+list_sites) ⇒ <code>Promise</code>
+    * [.stat_sites()](#UnifiAPI+stat_sites) ⇒ <code>Promise</code>
+    * [.add_site(name, description, site)](#UnifiAPI+add_site) ⇒ <code>Promise</code>
+    * [.remove_site(name, site)](#UnifiAPI+remove_site) ⇒ <code>Promise</code>
+    * [.list_wlan_groups(site)](#UnifiAPI+list_wlan_groups) ⇒ <code>Promise</code>
+    * [.stat_sysinfo(site)](#UnifiAPI+stat_sysinfo) ⇒ <code>Promise</code>
+    * [.list_self(site)](#UnifiAPI+list_self) ⇒ <code>Promise</code>
+    * [.list_networkconf(site)](#UnifiAPI+list_networkconf) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -703,6 +710,130 @@ List sites
 **Example**  
 ```js
 unifi.list_sites()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_sites"></a>
+
+### unifiAPI.stat_sites() ⇒ <code>Promise</code>
+Sites stats
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Example**  
+```js
+unifi.stat_sites()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+add_site"></a>
+
+### unifiAPI.add_site(name, description, site) ⇒ <code>Promise</code>
+Add new site
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name |
+| description | <code>string</code> | description - optional |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.add_site('mysite','Experimental site')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+remove_site"></a>
+
+### unifiAPI.remove_site(name, site) ⇒ <code>Promise</code>
+Remove site
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.remove_site('mysite')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_wlan_groups"></a>
+
+### unifiAPI.list_wlan_groups(site) ⇒ <code>Promise</code>
+List WLANGroups
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_wlan_groups()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_sysinfo"></a>
+
+### unifiAPI.stat_sysinfo(site) ⇒ <code>Promise</code>
+Stat Sysinfo
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_sysinfo()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_self"></a>
+
+### unifiAPI.list_self(site) ⇒ <code>Promise</code>
+Get information aboult self (username, etc)
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_self()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_networkconf"></a>
+
+### unifiAPI.list_networkconf(site) ⇒ <code>Promise</code>
+Get information aboult the network configuration
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_networkconf()
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```
