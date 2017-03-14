@@ -193,6 +193,9 @@ let unifi = UnifiAPI({
     * [.get_wlanconf(site)](#UnifiAPI+get_wlanconf) ⇒ <code>Promise</code>
     * [.list_alarms(site)](#UnifiAPI+list_alarms) ⇒ <code>Promise</code>
     * [.set_ap_led(ap_id, led_override, site)](#UnifiAPI+set_ap_led) ⇒ <code>Promise</code>
+    * [.set_ap_name(ap_id, name, site)](#UnifiAPI+set_ap_name) ⇒ <code>Promise</code>
+    * [.set_ap_wireless(ap_id, radio, channel, ht, min_rssi, min_rssi_enabled, antenna_gain, tx_power_mode, site)](#UnifiAPI+set_ap_wireless) ⇒ <code>Promise</code>
+    * [.status(site)](#UnifiAPI+status) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -1484,6 +1487,70 @@ Set the access point LED
 **Example**  
 ```js
 unifi.set_ap_led('12312312312','default')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_ap_name"></a>
+
+### unifiAPI.set_ap_name(ap_id, name, site) ⇒ <code>Promise</code>
+Change the name of an Access Point
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | the ID of the AP |
+| name | <code>string</code> | the new name |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_ap_name('12312312312','new ap')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_ap_wireless"></a>
+
+### unifiAPI.set_ap_wireless(ap_id, radio, channel, ht, min_rssi, min_rssi_enabled, antenna_gain, tx_power_mode, site) ⇒ <code>Promise</code>
+Set wireless properties per AP
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | the ID of the AP |
+| radio | <code>string</code> | radio type. ng/ac/bg. Optional. Default ng |
+| channel | <code>number</code> | The channel number or auto. Optional. Default auto. |
+| ht | <code>number</code> | channel width. 20/40/80/160. Optional. Default 20. |
+| min_rssi | <code>number</code> | Minimal RSSI accepted in dbi. Optional. Default -94 |
+| min_rssi_enabled | <code>boolean</code> | If enabled, drops users bellow that rssi valur. Optional. Default false |
+| antenna_gain | <code>number</code> | The antenna gain. Optional. Default 6 dbi |
+| tx_power_mode | <code>string</code> | TX Power Mode. Optional. Default auto |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_ap_wireless('12312312312','ng', 3)
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+status"></a>
+
+### unifiAPI.status(site) ⇒ <code>Promise</code>
+Check status
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.status()
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```
