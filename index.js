@@ -877,6 +877,20 @@ UnifiAPI.prototype.site_ledsoff = function(site = undefined) {
     }, {}, undefined, site);
 };
 
+/**
+ * Change AP wireless settings
+ * @param {string} ap_id internal id of the AP
+ * @param {string} radio The radio type. Supports ng or ac. Default ng. Optional
+ * @param {number} channel Wireless channel. Optional. Default 1. Could be string 'auto'
+ * @param {number} ht HT width in MHz. 20, 40, 80, 160. Optional. Default 20
+ * @param {number} tx_power_mode TX Power Mode. Optional. Default 0
+ * @param {number} tx_power TX Power. Optional. Default 0
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_ap_radiosettings('aa0101023faabbaacc0c0', 'ng', 3, 20)
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', channel = 1, ht = '20', tx_power_mode = 0, tx_power = 0) {
     return this.netsite('/upd/device/' + ap_id, {
         radio: radio,
@@ -887,34 +901,84 @@ UnifiAPI.prototype.set_ap_radiosettings = function(ap_id = '', radio = 'ng', cha
     }, {}, undefined, site);
 };
 
+/**
+ * Alias to list_settings. Retrieve array with settings defined by setting key.
+ * @alias list_settings
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.get_settings()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.get_settings = function(site = undefined) {
-    return this.netsite('/get/setting', undefined, {}, undefined, site)
-}
+    return this.netsite('/get/setting', undefined, {}, undefined, site);
+};
 
+/**
+ * Retrieve settings by a specific settings key. Only elements with this settings key will be returned in the array. Usually 1 or 0
+ * Typical keys are mgmt, snmp, porta, locale, rsyslogd, auto_speedtest, country, connectivity
+ * @param {string} key key
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.get_settings_by_key('mgmt')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.get_settings_by_key = function(key, site = undefined) {
     return new Promise((resolve, reject) => {
         this.get_settings(site)
             .then((data) => {
-                data.data = data.data.filter(n => n.key == key)
-                resolve(data)
+                data.data = data.data.filter(n => n.key == key);
+                resolve(data);
             })
-            .catch(reject)
-    })
-}
+            .catch(reject);
+    });
+};
 
+/**
+ * Set settings by key modifies properties of the settings, defined by key
+ * @param {string} key key
+ * @param {object} obj object of properties that overwrite the original values
+ * @param {string} site Ubiquiti site to query, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_settings_by_key('mgmt', { auto_upgrade: true })
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_settings = function(key, obj, site = undefined) {
     return new Promise((resolve, reject) => {
         this.get_settings_by_key(key, site)
             .then((data) => {
-                if (data.data.length < 1) return reject({ msg: 'No such key', meta: { rc: 'error' } })
-                let o = merge(true, data.data[0], obj)
-                return this.netsite('/set/setting/' + o.key + '/' + o._id, o, {}, undefined, site)
+                if (data.data.length < 1) return reject({ msg: 'No such key', meta: { rc: 'error' } });
+                let o = merge(true, data.data[0], obj);
+                return this.netsite('/set/setting/' + o.key + '/' + o._id, o, {}, undefined, site);
             })
             .then(resolve)
-            .catch(reject)
-    })
-}
+            .catch(reject);
+    });
+};
 
+/**
+ * Set Guest Settings and Guest Access Portal are created with this method
+ * @param {object} obj Object of properties that modify the original values
+ * @param {string} obj.auth Optional. Type of authentication. hotspot, radius, none, .... Default hotspot
+ * @param {string} obj.expire Optional. How long the authentication is valid in minutes. Default 480 (8h)
+ * @param {boolean} obj.facebook_enabled Optional. Allow authentication with facebook. Default false
+ * @param {boolean} obj.google_enabled Optional. Allow authentication with google+. Default false
+ * @param {boolean} obj.payment Optional. Allow payments for authentication. Default false
+ * @param {boolean} obj.portal_customized Optional. Customize the auth portal. Default false
+ * @param {boolean} obj.portal_enabled Optional. Enable the portal. Default true
+ * @param {boolean} obj.redirect_enabled Optional. Redirect after authentication. Default false
+ * @param {string} obj.redirect_url Optional. Redirect URL after successful authentication. Default empty
+ * @param {boolean} obj.voucher_enabled Optional. If voucher authentication is enabled. Default false
+ * @param {string} guest_id From the get_settings, the ID of the guest settings
+ * @param {string} site_id The ID of the current site
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_guest_access({ auth: 'hotspot', payment_enabled: true }, 'aabbaa01010203','ccffee0102030303')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id, site = undefined) {
     let o = merge({}, {
         _id: guest_id || obj._id,
@@ -973,10 +1037,23 @@ UnifiAPI.prototype.set_guest_access = function(obj, guest_id, site_id, site = un
         'x_facebook_app_secret': 'UBNT',
         'x_google_client_secret': 'UBNT',
         'x_password': 'UBNT'
-    }, obj)
-    return this.netsite('/set/setting/guest_access/' + o._id, o, {}, undefined, site)
-}
+    }, obj);
+    return this.netsite('/set/setting/guest_access/' + o._id, o, {}, undefined, site);
+};
 
+/**
+ * Set Guest Login Settings (simplified version)
+ * @param {boolean} portal_enabled If the portal is enabled. Optional. Default true
+ * @param {boolean} portal_customized If the portal is customized. Optional. Default true
+ * @param {boolean} redirect_enabled If the redirection is enabled. Optional. Default false
+ * @param {string} redirect_url The url for redirection. Optional. Default ''
+ * @param {string} x_password Password for the portal. Optional. Default ''
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_guestlogin_settings(true, true, true, 'http://news.com')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, portal_customized = true, redirect_enabled = false, redirect_url = '', x_password = '', expire_number = undefined, expire_unit = undefined, site_id = undefined, site = undefined) {
     return this.netsite('/set/setting/guest_access', {
         portal_enabled: portal_enabled,
@@ -987,43 +1064,106 @@ UnifiAPI.prototype.set_guestlogin_settings = function(portal_enabled = true, por
         expire_number: expire_number,
         expire_unit: expire_unit,
         site_id: site_id
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Rename Access Point
+ * @param {string} ap_id Id of the AP
+ * @param {string} ap_name New name of the AP
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.rename_ap('ccffee0102030303','My Access Point')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.rename_ap = function(ap_id = '', ap_name = '', site = undefined) {
     return this.netsite('/upd/device/' + ap_id, {
         name: ap_name
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * Set WLAN Settings
+ * @param {strings} wlan_id ID of the Wlan
+ * @param {string} x_password Password of the WLAN
+ * @param {string} name Name of the WLAN
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_wlansettings('ccffee0102030303', 'guest', 'GuestWLAN')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_wlansettings = function(wlan_id = '', x_password = undefined, name = undefined, site = undefined) { // TODO: test it
     return this.netsite('/upd/wlanconf/' + wlan_id, {
         x_passphrase: x_password,
         name: name
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List the Events
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.list_events()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_events = function(site = undefined) {
-    return this.netsite('/stat/event', undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/event', undefined, {}, undefined, site);
+};
 
+/**
+ * Get WLAN Config. Respond with Array of Wlan configurations
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.list_wlanconf()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_wlanconf = function(site = undefined) {
-    return this.netsite('/list/wlanconf', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/wlanconf', undefined, {}, undefined, site);
+};
 
+/**
+ * Get WLAN Config. Second REST option. Respond with Array of Wlan configurations
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.get_wlanconf()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.get_wlanconf = function(site = undefined) {
-    return this.netsite('/rest/wlanconf', undefined, {}, undefined, site)
-}
+    return this.netsite('/rest/wlanconf', undefined, {}, undefined, site);
+};
 
+/**
+ * List the Alarms
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.list_alarms()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_alarms = function(site = undefined) {
-    return this.netsite('/list/alarm', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/alarm', undefined, {}, undefined, site);
+};
 
-UnifiAPI.prototype.set_ap_let = function(ap_id = '', led_override = 'default', site = undefined) {
+/**
+ * Set the access point LED
+ * @param {string} ap_id AP ID
+ * @param {string} led_override Do we follow the standard LED config. Options default and overwrite
+ * @param {string} site Ubiquiti site to query, if different from default - optonal
+ * @return {Promise} Promise
+ * @example unifi.set_ap_led('12312312312','default')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.set_ap_led = function(ap_id = '', led_override = 'default', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {
         led_override: led_override
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
 UnifiAPI.prototype.set_ap_name = function(ap_id, name = '', site = undefined) {
     return this.netsite('/rest/device/' + ap_id, {

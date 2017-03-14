@@ -85,6 +85,17 @@ Be careful - when we use the cloud access all the Unifi calls are available unde
 
 # API
 
+## Functions
+
+<dl>
+<dt><a href="#UnifiAPI">UnifiAPI(options)</a> ⇒</dt>
+<dd><p>The main class and the initialization of the Unifi Access</p>
+</dd>
+<dt><a href="#list_settings">list_settings(site)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Alias to list_settings. Retrieve array with settings defined by setting key.</p>
+</dd>
+</dl>
+
 <a name="UnifiAPI"></a>
 
 ## UnifiAPI(options) ⇒
@@ -170,6 +181,18 @@ let unifi = UnifiAPI({
     * [.unset_locate_ap(mac, site)](#UnifiAPI+unset_locate_ap) ⇒ <code>Promise</code>
     * [.site_ledson(site)](#UnifiAPI+site_ledson) ⇒ <code>Promise</code>
     * [.site_ledsoff(site)](#UnifiAPI+site_ledsoff) ⇒ <code>Promise</code>
+    * [.set_ap_radiosettings(ap_id, radio, channel, ht, tx_power_mode, tx_power, site)](#UnifiAPI+set_ap_radiosettings) ⇒ <code>Promise</code>
+    * [.get_settings_by_key(key, site)](#UnifiAPI+get_settings_by_key) ⇒ <code>Promise</code>
+    * [.set_settings(key, obj, site)](#UnifiAPI+set_settings) ⇒ <code>Promise</code>
+    * [.set_guest_access(obj, guest_id, site_id, site)](#UnifiAPI+set_guest_access) ⇒ <code>Promise</code>
+    * [.set_guestlogin_settings(portal_enabled, portal_customized, redirect_enabled, redirect_url, x_password, site)](#UnifiAPI+set_guestlogin_settings) ⇒ <code>Promise</code>
+    * [.rename_ap(ap_id, ap_name, site)](#UnifiAPI+rename_ap) ⇒ <code>Promise</code>
+    * [.set_wlansettings(wlan_id, x_password, name, site)](#UnifiAPI+set_wlansettings) ⇒ <code>Promise</code>
+    * [.list_events(site)](#UnifiAPI+list_events) ⇒ <code>Promise</code>
+    * [.list_wlanconf(site)](#UnifiAPI+list_wlanconf) ⇒ <code>Promise</code>
+    * [.get_wlanconf(site)](#UnifiAPI+get_wlanconf) ⇒ <code>Promise</code>
+    * [.list_alarms(site)](#UnifiAPI+list_alarms) ⇒ <code>Promise</code>
+    * [.set_ap_led(ap_id, led_override, site)](#UnifiAPI+set_ap_led) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -1210,6 +1233,275 @@ All devices in the site group will stop blinking
 **Example**  
 ```js
 unifi.site_ledsoff()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_ap_radiosettings"></a>
+
+### unifiAPI.set_ap_radiosettings(ap_id, radio, channel, ht, tx_power_mode, tx_power, site) ⇒ <code>Promise</code>
+Change AP wireless settings
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | internal id of the AP |
+| radio | <code>string</code> | The radio type. Supports ng or ac. Default ng. Optional |
+| channel | <code>number</code> | Wireless channel. Optional. Default 1. Could be string 'auto' |
+| ht | <code>number</code> | HT width in MHz. 20, 40, 80, 160. Optional. Default 20 |
+| tx_power_mode | <code>number</code> | TX Power Mode. Optional. Default 0 |
+| tx_power | <code>number</code> | TX Power. Optional. Default 0 |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_ap_radiosettings('aa0101023faabbaacc0c0', 'ng', 3, 20)
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+get_settings_by_key"></a>
+
+### unifiAPI.get_settings_by_key(key, site) ⇒ <code>Promise</code>
+Retrieve settings by a specific settings key. Only elements with this settings key will be returned in the array. Usually 1 or 0
+Typical keys are mgmt, snmp, porta, locale, rsyslogd, auto_speedtest, country, connectivity
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | key |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.get_settings_by_key('mgmt')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_settings"></a>
+
+### unifiAPI.set_settings(key, obj, site) ⇒ <code>Promise</code>
+Set settings by key modifies properties of the settings, defined by key
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | key |
+| obj | <code>object</code> | object of properties that overwrite the original values |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_settings_by_key('mgmt', { auto_upgrade: true })
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_guest_access"></a>
+
+### unifiAPI.set_guest_access(obj, guest_id, site_id, site) ⇒ <code>Promise</code>
+Set Guest Settings and Guest Access Portal are created with this method
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| obj | <code>object</code> | Object of properties that modify the original values |
+| obj.auth | <code>string</code> | Optional. Type of authentication. hotspot, radius, none, .... Default hotspot |
+| obj.expire | <code>string</code> | Optional. How long the authentication is valid in minutes. Default 480 (8h) |
+| obj.facebook_enabled | <code>boolean</code> | Optional. Allow authentication with facebook. Default false |
+| obj.google_enabled | <code>boolean</code> | Optional. Allow authentication with google+. Default false |
+| obj.payment | <code>boolean</code> | Optional. Allow payments for authentication. Default false |
+| obj.portal_customized | <code>boolean</code> | Optional. Customize the auth portal. Default false |
+| obj.portal_enabled | <code>boolean</code> | Optional. Enable the portal. Default true |
+| obj.redirect_enabled | <code>boolean</code> | Optional. Redirect after authentication. Default false |
+| obj.redirect_url | <code>string</code> | Optional. Redirect URL after successful authentication. Default empty |
+| obj.voucher_enabled | <code>boolean</code> | Optional. If voucher authentication is enabled. Default false |
+| guest_id | <code>string</code> | From the get_settings, the ID of the guest settings |
+| site_id | <code>string</code> | The ID of the current site |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_guest_access({ auth: 'hotspot', payment_enabled: true }, 'aabbaa01010203','ccffee0102030303')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_guestlogin_settings"></a>
+
+### unifiAPI.set_guestlogin_settings(portal_enabled, portal_customized, redirect_enabled, redirect_url, x_password, site) ⇒ <code>Promise</code>
+Set Guest Login Settings (simplified version)
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| portal_enabled | <code>boolean</code> | If the portal is enabled. Optional. Default true |
+| portal_customized | <code>boolean</code> | If the portal is customized. Optional. Default true |
+| redirect_enabled | <code>boolean</code> | If the redirection is enabled. Optional. Default false |
+| redirect_url | <code>string</code> | The url for redirection. Optional. Default '' |
+| x_password | <code>string</code> | Password for the portal. Optional. Default '' |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_guestlogin_settings(true, true, true, 'http://news.com')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+rename_ap"></a>
+
+### unifiAPI.rename_ap(ap_id, ap_name, site) ⇒ <code>Promise</code>
+Rename Access Point
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | Id of the AP |
+| ap_name | <code>string</code> | New name of the AP |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.rename_ap('ccffee0102030303','My Access Point')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_wlansettings"></a>
+
+### unifiAPI.set_wlansettings(wlan_id, x_password, name, site) ⇒ <code>Promise</code>
+Set WLAN Settings
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| wlan_id | <code>strings</code> | ID of the Wlan |
+| x_password | <code>string</code> | Password of the WLAN |
+| name | <code>string</code> | Name of the WLAN |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_wlansettings('ccffee0102030303', 'guest', 'GuestWLAN')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_events"></a>
+
+### unifiAPI.list_events(site) ⇒ <code>Promise</code>
+List the Events
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.list_events()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_wlanconf"></a>
+
+### unifiAPI.list_wlanconf(site) ⇒ <code>Promise</code>
+Get WLAN Config. Respond with Array of Wlan configurations
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.list_wlanconf()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+get_wlanconf"></a>
+
+### unifiAPI.get_wlanconf(site) ⇒ <code>Promise</code>
+Get WLAN Config. Second REST option. Respond with Array of Wlan configurations
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.get_wlanconf()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_alarms"></a>
+
+### unifiAPI.list_alarms(site) ⇒ <code>Promise</code>
+List the Alarms
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.list_alarms()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_ap_led"></a>
+
+### unifiAPI.set_ap_led(ap_id, led_override, site) ⇒ <code>Promise</code>
+Set the access point LED
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ap_id | <code>string</code> | AP ID |
+| led_override | <code>string</code> | Do we follow the standard LED config. Options default and overwrite |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optonal |
+
+**Example**  
+```js
+unifi.set_ap_led('12312312312','default')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="list_settings"></a>
+
+## list_settings(site) ⇒ <code>Promise</code>
+Alias to list_settings. Retrieve array with settings defined by setting key.
+
+**Kind**: global function  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site to query, if different from default - optional |
+
+**Example**  
+```js
+unifi.get_settings()
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```
