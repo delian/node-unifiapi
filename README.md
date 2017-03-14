@@ -32,7 +32,7 @@ The easiest method to avoid it is to use non desktop (non X11 based) Linux distr
 
 ## Usage
 
-All the API is based on Promises
+All the API are Promises
 
 ### Direct access to Ubiquiti Unifi Controller
 If you have a direct access to Ubiquiti Unifi Controller, you could use the following API:
@@ -130,6 +130,20 @@ let unifi = UnifiAPI({
     * [.stat_hourly_site(start, end, site)](#UnifiAPI+stat_hourly_site) ⇒ <code>Promise</code>
     * [.stat_hourly_ap(start, end, site)](#UnifiAPI+stat_hourly_ap) ⇒ <code>Promise</code>
     * [.stat_sta_sessions_latest(mac, limit, sort, site)](#UnifiAPI+stat_sta_sessions_latest) ⇒ <code>Promise</code>
+    * [.stat_auths(start, end, site)](#UnifiAPI+stat_auths) ⇒ <code>Promise</code>
+    * [.stat_allusers(historyhours, site)](#UnifiAPI+stat_allusers) ⇒ <code>Promise</code>
+    * [.list_guests(historyhours, site)](#UnifiAPI+list_guests) ⇒ <code>Promise</code>
+    * [.list_guests2(historyhours, site)](#UnifiAPI+list_guests2) ⇒ <code>Promise</code>
+    * [.list_clients(mac, site)](#UnifiAPI+list_clients) ⇒ <code>Promise</code>
+    * [.stat_client(mac, site)](#UnifiAPI+stat_client) ⇒ <code>Promise</code>
+    * [.list_usergroup(site)](#UnifiAPI+list_usergroup) ⇒ <code>Promise</code>
+    * [.set_usergroup(userid, groupid, site)](#UnifiAPI+set_usergroup) ⇒ <code>Promise</code>
+    * [.list_health(site)](#UnifiAPI+list_health) ⇒ <code>Promise</code>
+    * [.list_dashboard(site)](#UnifiAPI+list_dashboard) ⇒ <code>Promise</code>
+    * [.list_users(site)](#UnifiAPI+list_users) ⇒ <code>Promise</code>
+    * [.list_aps(mac, site)](#UnifiAPI+list_aps) ⇒ <code>Promise</code>
+    * [.list_rogueaps(within, site)](#UnifiAPI+list_rogueaps) ⇒ <code>Promise</code>
+    * [.list_sites()](#UnifiAPI+list_sites) ⇒ <code>Promise</code>
 
 <a name="UnifiAPI+login"></a>
 
@@ -432,5 +446,263 @@ Last station sessions
 ```js
 unifi.stat_sta_sessions_latest('00:01:02:03:04:05', 10)
     .then(done => console.log('Success', done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_auths"></a>
+
+### unifiAPI.stat_auths(start, end, site) ⇒ <code>Promise</code>
+List authorizations
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
+| end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_auths()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_allusers"></a>
+
+### unifiAPI.stat_allusers(historyhours, site) ⇒ <code>Promise</code>
+List all users
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| historyhours | <code>number</code> | How many hours back to query. Optional. Default 8670 |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_allusers()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_guests"></a>
+
+### unifiAPI.list_guests(historyhours, site) ⇒ <code>Promise</code>
+List of guests (authorized via the guest portal)
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| historyhours | <code>number</code> | How many hours back to query. Optional. Default 8670 |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_guests()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_guests2"></a>
+
+### unifiAPI.list_guests2(historyhours, site) ⇒ <code>Promise</code>
+List of guests (authorized via the guest portal) but with modern internal api
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| historyhours | <code>number</code> | How many hours back to query. Optional. Default 8670 |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_guests2()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_clients"></a>
+
+### unifiAPI.list_clients(mac, site) ⇒ <code>Promise</code>
+List of (all) clients per station
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_clients()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+stat_client"></a>
+
+### unifiAPI.stat_client(mac, site) ⇒ <code>Promise</code>
+Statistics of (all) clients per station
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | Mac address |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.stat_client()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_usergroup"></a>
+
+### unifiAPI.list_usergroup(site) ⇒ <code>Promise</code>
+List of the usergroups
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_usergroup()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+set_usergroup"></a>
+
+### unifiAPI.set_usergroup(userid, groupid, site) ⇒ <code>Promise</code>
+Add user to a group
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| userid | <code>string</code> | ID of the user |
+| groupid | <code>string</code> | ID of the group |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.set_usergroup('11aa22bb33cc44dd55ee66ff', '112233445566778899aabb')
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_health"></a>
+
+### unifiAPI.list_health(site) ⇒ <code>Promise</code>
+List health
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_health()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_dashboard"></a>
+
+### unifiAPI.list_dashboard(site) ⇒ <code>Promise</code>
+List dashboard
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_dashboard()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_users"></a>
+
+### unifiAPI.list_users(site) ⇒ <code>Promise</code>
+List users
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_users()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_aps"></a>
+
+### unifiAPI.list_aps(mac, site) ⇒ <code>Promise</code>
+List APs
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| mac | <code>string</code> | AP mac/id, Optional |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_aps()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_rogueaps"></a>
+
+### unifiAPI.list_rogueaps(within, site) ⇒ <code>Promise</code>
+List Rogue APs
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| within | <code>number</code> | For how many hours back. Optional. Default 24h |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_rogueaps()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_sites"></a>
+
+### unifiAPI.list_sites() ⇒ <code>Promise</code>
+List sites
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+**Example**  
+```js
+unifi.list_sites()
+    .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```

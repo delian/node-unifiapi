@@ -318,7 +318,16 @@ UnifiAPI.prototype.stat_sta_sessions_latest = function(mac = '', limit = 5, sort
     }, {}, undefined, site);
 };
 
-
+/**
+ * List authorizations
+ * @param {number} start Start time in Unix Timestamp - Optional. Default 7 days ago
+ * @param {number} end End time in Unix timestamp - Optional. Default - now
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_auths()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, site = undefined) {
     return this.netsite('/stat/authorization', {
         end: end || (new Date()).getTime(),
@@ -326,67 +335,179 @@ UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, sit
     }, {}, undefined, site);
 };
 
+/**
+ * List all users
+ * @param {number} historyhours How many hours back to query. Optional. Default 8670
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_allusers()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, site = undefined) {
     return this.netsite('/stat/alluser', {
         type: 'all',
         conn: 'all',
         within: historyhours
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List of guests (authorized via the guest portal)
+ * @param {number} historyhours How many hours back to query. Optional. Default 8670
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_guests()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_guests = function(historyhours = 8670, site = undefined) {
     return this.netsite('/stat/guest', {
         within: historyhours
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List of guests (authorized via the guest portal) but with modern internal api
+ * @param {number} historyhours How many hours back to query. Optional. Default 8670
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_guests2()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_guests2 = function(historyhours = 8670, site = undefined) {
-    return this.netsite('/stat/guest?within=' + historyhours, undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/guest?within=' + historyhours, undefined, {}, undefined, site);
+};
 
+/**
+ * List of (all) clients per station
+ * @param {string} mac Mac address
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_clients()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_clients = function(mac = '', site = undefined) {
-    return this.netsite('/stat/sta/' + mac, undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/sta/' + mac, undefined, {}, undefined, site);
+};
 
+/**
+ * Statistics of (all) clients per station
+ * @param {string} mac Mac address
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.stat_client()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.stat_client = function(mac = '', site = undefined) {
-    return this.netsite('/stat/user/' + mac, undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/user/' + mac, undefined, {}, undefined, site);
+};
 
+/**
+ * List of the usergroups
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_usergroup()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_usergroup = function(site = undefined) {
-    return this.netsite('/list/usergroup', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/usergroup', undefined, {}, undefined, site);
+};
 
+/**
+ * Add user to a group
+ * @param {string} userid ID of the user
+ * @param {string} groupid ID of the group
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.set_usergroup('11aa22bb33cc44dd55ee66ff', '112233445566778899aabb')
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.set_usergroup = function(userid = '', groupid = '', site = undefined) {
     return this.netsite('/upd/user/' + userid, {
         usergroup_id: groupid
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List health
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_health()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_health = function(site = undefined) {
-    return this.netsite('/stat/health', undefined, {}, undefined, site)
-}
+    return this.netsite('/stat/health', undefined, {}, undefined, site);
+};
 
+/**
+ * List dashboard
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_dashboard()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_dashboard = function(site = undefined) {
     return this.netsite('/stat/dashboard', undefined, {}, undefined, site)
-}
+};
 
+/**
+ * List users
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_users()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_users = function(site = undefined) {
-    return this.netsite('/list/user', undefined, {}, undefined, site)
-}
+    return this.netsite('/list/user', undefined, {}, undefined, site);
+};
 
+/**
+ * List APs
+ * @param {string} mac AP mac/id, Optional
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_aps()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_aps = function(mac = '', site = undefined) { // TODO: not working with mac different than none
     return this.netsite('/stat/device/' + mac, undefined, {}, undefined, site)
-}
+};
 
+/**
+ * List Rogue APs
+ * @param {number} within For how many hours back. Optional. Default 24h
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_rogueaps()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_rogueaps = function(within = 24, site = undefined) {
     return this.netsite('/stat/rogueap', {
         within: within
-    }, {}, undefined, site)
-}
+    }, {}, undefined, site);
+};
 
+/**
+ * List sites
+ * @return {Promise} Promise
+ * @example unifi.list_sites()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
 UnifiAPI.prototype.list_sites = function() {
-    return this.net.req('/api/self/sites')
-}
+    return this.net.req('/api/self/sites');
+};
 
 UnifiAPI.prototype.stat_sites = function() {
     return this.net.req('/api/stat/sites')
