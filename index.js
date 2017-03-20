@@ -90,13 +90,13 @@ UnifiAPI.prototype.logout = function() {
  */
 UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undefined, down = undefined, mbytes = undefined, apmac = undefined, site = undefined) {
     return this.netsite('/cmd/stamgr', {
-        cmd: 'authorize_guest',
+        cmd: 'authorize-guest',
         mac: mac.toLowerCase(),
         minutes: minutes,
         up: up,
         down: down,
         bytes: mbytes,
-        ap_mac: apmac.toLowerCase()
+        ap_mac: apmac && apmac.toLowerCase()
     }, {}, undefined, site);
 };
 
@@ -111,7 +111,7 @@ UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undef
  */
 UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
-        cmd: 'uauthorize_guest',
+        cmd: 'uauthorize-guest',
         mac: mac.toLowerCase()
     }, {}, undefined, site);
 };
