@@ -83,6 +83,11 @@ If you have to access the Unifi Controller if it is behind NAT and you need to u
 
 Be careful - when we use the cloud access all the Unifi calls are available under the .api property, to not confuse with the API calls that are related to the cloud management itself.
 
+# Rebuild Readme.md
+If you want to modify the README.md file for any reason (added jsdoc comment somewhere or have done change to README.hbs) please run
+
+    npm run readme
+
 # API
 
 ## Functions
@@ -133,6 +138,7 @@ let unifi = UnifiAPI({
 ```
 
 * [UnifiAPI(options)](#UnifiAPI) ⇒
+    * [.netsite(url, jsonParams, headers, method, site)](#UnifiAPI+netsite) ⇒
     * [.login(username, password)](#UnifiAPI+login) ⇒ <code>Promise</code>
     * [.logout()](#UnifiAPI+logout)
     * [.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)](#UnifiAPI+authorize_guest) ⇒ <code>Promise</code>
@@ -143,10 +149,10 @@ let unifi = UnifiAPI({
     * [.unblock_sta(mac, site)](#UnifiAPI+unblock_sta) ⇒ <code>Promise</code>
     * [.set_sta_note(user, note, site)](#UnifiAPI+set_sta_note) ⇒ <code>Promise</code>
     * [.set_sta_name(user, name, site)](#UnifiAPI+set_sta_name) ⇒ <code>Promise</code>
-    * [.stat_sessions(start, end, site)](#UnifiAPI+stat_sessions) ⇒ <code>Promise</code>
-    * [.stat_daily_site(start, end, site)](#UnifiAPI+stat_daily_site) ⇒ <code>Promise</code>
-    * [.stat_hourly_site(start, end, site)](#UnifiAPI+stat_hourly_site) ⇒ <code>Promise</code>
-    * [.stat_hourly_ap(start, end, site)](#UnifiAPI+stat_hourly_ap) ⇒ <code>Promise</code>
+    * [.stat_sessions(start, end, type, site)](#UnifiAPI+stat_sessions) ⇒ <code>Promise</code>
+    * [.stat_daily_site(start, end, attrs, site)](#UnifiAPI+stat_daily_site) ⇒ <code>Promise</code>
+    * [.stat_hourly_site(start, end, attrs, site)](#UnifiAPI+stat_hourly_site) ⇒ <code>Promise</code>
+    * [.stat_hourly_ap(start, end, attrs, site)](#UnifiAPI+stat_hourly_ap) ⇒ <code>Promise</code>
     * [.stat_sta_sessions_latest(mac, limit, sort, site)](#UnifiAPI+stat_sta_sessions_latest) ⇒ <code>Promise</code>
     * [.stat_auths(start, end, site)](#UnifiAPI+stat_auths) ⇒ <code>Promise</code>
     * [.stat_allusers(historyhours, site)](#UnifiAPI+stat_allusers) ⇒ <code>Promise</code>
@@ -217,6 +223,28 @@ let unifi = UnifiAPI({
     * [.sdn_onoff(enabled, site_id, site)](#UnifiAPI+sdn_onoff) ⇒ <code>Promise</code>
     * [.extend_voucher(voucher_id, site)](#UnifiAPI+extend_voucher) ⇒ <code>Promise</code>
 
+<a name="UnifiAPI+netsite"></a>
+
+### unifiAPI.netsite(url, jsonParams, headers, method, site) ⇒
+Generic network operation, executing Ubiquiti command under /api/s/{site}/... rest api
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | The right part of the URL (/api/s/{site}/ is automatically added) |
+| jsonParams | <code>object</code> | optional. Default undefined. If it is defined and it is object, those will be the JSON POST attributes sent to the URL and the the default method is changed from GET to POST |
+| headers | <code>object</code> | optional. Default {}. HTTP headers that we require to be sent in the request |
+| method | <code>object</code> | optional. Default undefined. The HTTP request method. If undefined, then it is automatic. If no jsonParams specified, it will be GET. If jsonParams are specified it will be POST |
+| site | <code>string</code> | optional. The {site} atribute of the request. If not specified, it is taken from the UnifiAPI init options, where if it is not specified, it is "default" |
+
+**Example**  
+```js
+unifi.netsite('/cmd/stamgr', { cmd: 'authorize-guest', mac: '00:01:02:03:04:05', minutes: 60 }, {}, 'POST', 'default')
+    .then(data => console.log('Success', data))
+    .catch(error => console.log('Error', error));
+```
 <a name="UnifiAPI+login"></a>
 
 ### unifiAPI.login(username, password) ⇒ <code>Promise</code>
@@ -233,8 +261,8 @@ Explicit login to the controller. It is not necessary, as every other method cal
 **Example**  
 ```js
 unifi.login(username, password)
-    .then((data) => console.log('success', data))
-    .catch((err) => console.log('Error', err))
+    .then(data => console.log('success', data))
+    .catch(err => console.log('Error', err))
 ```
 <a name="UnifiAPI+logout"></a>
 
@@ -246,7 +274,7 @@ Logout of the controller
 ```js
 unifi.logout()
     .then(() => console.log('Success'))
-    .catch((err) => console.log('Error', err))
+    .catch(err => console.log('Error', err))
 ```
 <a name="UnifiAPI+authorize_guest"></a>
 
@@ -269,8 +297,8 @@ Authorize guest by a MAC address
 **Example**  
 ```js
 unifi.authorize_guest('01:02:aa:bb:cc')
-    .then((data) => console.log('Successful authorization'))
-    .catch((err) => console.log('Error', err))
+    .then(data => console.log('Successful authorization'))
+    .catch(err => console.log('Error', err))
 ```
 <a name="UnifiAPI+unauthorize_guest"></a>
 
@@ -288,8 +316,8 @@ De-authorize guest by a MAC address
 **Example**  
 ```js
 unifi.unauthorize_guest('00:01:02:03:aa:bb')
-    .then((done) => console.log('Success', done))
-    .catch((err) => console.log('Error', err))
+    .then(done => console.log('Success', done))
+    .catch(err => console.log('Error', err))
 ```
 <a name="UnifiAPI+kick_sta"></a>
 
@@ -421,7 +449,7 @@ unifi.set_sta_name('aabbaa0102aa03aa3322','') // remove name
 ```
 <a name="UnifiAPI+stat_sessions"></a>
 
-### unifiAPI.stat_sessions(start, end, site) ⇒ <code>Promise</code>
+### unifiAPI.stat_sessions(start, end, type, site) ⇒ <code>Promise</code>
 List client sessions
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
@@ -431,6 +459,7 @@ List client sessions
 | --- | --- | --- |
 | start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
 | end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| type | <code>string</code> | Sessions type. Optional. Default all |
 | site | <code>string</code> | Ubiquiti site, if different from default - optional |
 
 **Example**  
@@ -441,7 +470,7 @@ unifi.stat_sessions()
 ```
 <a name="UnifiAPI+stat_daily_site"></a>
 
-### unifiAPI.stat_daily_site(start, end, site) ⇒ <code>Promise</code>
+### unifiAPI.stat_daily_site(start, end, attrs, site) ⇒ <code>Promise</code>
 List daily site statistics
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
@@ -451,6 +480,7 @@ List daily site statistics
 | --- | --- | --- |
 | start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
 | end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| attrs | <code>array</code> | What attributes we are quering for. Optional. Default [ 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time' ] |
 | site | <code>string</code> | Ubiquiti site, if different from default - optional |
 
 **Example**  
@@ -461,7 +491,7 @@ unifi.stat_daily_site()
 ```
 <a name="UnifiAPI+stat_hourly_site"></a>
 
-### unifiAPI.stat_hourly_site(start, end, site) ⇒ <code>Promise</code>
+### unifiAPI.stat_hourly_site(start, end, attrs, site) ⇒ <code>Promise</code>
 List hourly site statistics
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
@@ -471,6 +501,7 @@ List hourly site statistics
 | --- | --- | --- |
 | start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
 | end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| attrs | <code>array</code> | What attributes we are quering for. Optional. Default [ 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time' ] |
 | site | <code>string</code> | Ubiquiti site, if different from default - optional |
 
 **Example**  
@@ -481,7 +512,7 @@ unifi.stat_hourly_site()
 ```
 <a name="UnifiAPI+stat_hourly_ap"></a>
 
-### unifiAPI.stat_hourly_ap(start, end, site) ⇒ <code>Promise</code>
+### unifiAPI.stat_hourly_ap(start, end, attrs, site) ⇒ <code>Promise</code>
 List hourly site statistics for ap
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
@@ -491,6 +522,7 @@ List hourly site statistics for ap
 | --- | --- | --- |
 | start | <code>number</code> | Start time in Unix Timestamp - Optional. Default 7 days ago |
 | end | <code>number</code> | End time in Unix timestamp - Optional. Default - now |
+| attrs | <code>array</code> | What attributes we are quering for. Optional. Default [ 'bytes', 'num_sta', 'time' ] |
 | site | <code>string</code> | Ubiquiti site, if different from default - optional |
 
 **Example**  
