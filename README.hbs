@@ -14,7 +14,7 @@ It is mimicking the UniFi-API-Browser API calls (the same commands the same effe
 
 ## Warning
 Quite unstable mostly due to the instability of the WebRTC implementation in Node.JS.
-Also highly uncompleted. Any help welcomed!
+Also highly incompleted and untested. Any help appreciated!
 
 ## Installation
 To install run:
