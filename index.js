@@ -352,10 +352,10 @@ UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, sit
  *     .then(done => console.log('Success',done))
  *     .catch(err => console.log('Error',err))
  */
-UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, site = undefined) {
+UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, type='all', conn='all', site = undefined) {
     return this.netsite('/stat/alluser', {
-        type: 'all',
-        conn: 'all',
+        type: type,
+        conn: conn,
         within: historyhours
     }, {}, undefined, site);
 };
