@@ -70,7 +70,7 @@ function CloudAPI(options) {
  * @return {undefined}
  */
 CloudAPI.prototype.debugging = function(enabled) {
-    this.debug = enable;
+    this.debug = enabled;
     debug.enabled = this.debug ? true : false;
     if (this.api && this.api.debugging) this.api.debugging(this.debug);
     debug('Debug is', this.debug ? 'enabled' : 'disabled');

@@ -47,8 +47,8 @@ function UnifiAPI(options) {
  * @param {boolean} enable Enable or disable the debugging
  * @returns {undefined}
  */
-UnifiAPI.prototype.debugging = function(enable) {
-    this.debug = enable;
+UnifiAPI.prototype.debugging = function(enabled) {
+    this.debug = enabled;
     debug.enabled = this.debug ? true : false;
     debug('Debug is', this.debug ? 'enabled' : 'disabled');
 };
