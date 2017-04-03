@@ -65,6 +65,19 @@ function CloudAPI(options) {
 }
 
 /**
+ * Enable or disable debugging
+ * @param {boolean} enabled Enable or Disable debugging
+ * @return {undefined}
+ */
+CloudAPI.prototype.debugging = function(enabled) {
+    this.debug = enable;
+    debug.enabled = this.debug ? true : false;
+    if (this.api && this.api.debugging) this.api.debugging(this.debug);
+    debug('Debug is', this.debug ? 'enabled' : 'disabled');
+};
+
+
+/**
  * Explicit login. Optional call as implicit login is always in place
  * @param {string} username username if different from default. 
  * @param {string} password password if different from default. 

@@ -138,7 +138,8 @@ let unifi = UnifiAPI({
 ```
 
 * [UnifiAPI(options)](#UnifiAPI) ⇒
-    * [.netsite(url, jsonParams, headers, method, site)](#UnifiAPI+netsite) ⇒
+    * [.debugging(enable)](#UnifiAPI+debugging) ⇒ <code>undefined</code>
+    * [.netsite(url, jsonParams, headers, method, site)](#UnifiAPI+netsite) ⇒ <code>Promise</code>
     * [.login(username, password)](#UnifiAPI+login) ⇒ <code>Promise</code>
     * [.logout()](#UnifiAPI+logout)
     * [.authorize_guest(mac, minutes, up, down, mbytes, apmac, site)](#UnifiAPI+authorize_guest) ⇒ <code>Promise</code>
@@ -223,13 +224,23 @@ let unifi = UnifiAPI({
     * [.sdn_onoff(enabled, site_id, site)](#UnifiAPI+sdn_onoff) ⇒ <code>Promise</code>
     * [.extend_voucher(voucher_id, site)](#UnifiAPI+extend_voucher) ⇒ <code>Promise</code>
 
+<a name="UnifiAPI+debugging"></a>
+
+### unifiAPI.debugging(enable) ⇒ <code>undefined</code>
+Enable or disable the debug of the module
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| enable | <code>boolean</code> | Enable or disable the debugging |
+
 <a name="UnifiAPI+netsite"></a>
 
-### unifiAPI.netsite(url, jsonParams, headers, method, site) ⇒
+### unifiAPI.netsite(url, jsonParams, headers, method, site) ⇒ <code>Promise</code>
 Generic network operation, executing Ubiquiti command under /api/s/{site}/... rest api
 
 **Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
-**Returns**: Promise  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1989,11 +2000,23 @@ cloud.self()
 ```
 
 * [CloudAPI(options)](#CloudAPI) ⇒
+    * [.debugging(enabled)](#CloudAPI+debugging) ⇒ <code>undefined</code>
     * [.login(username, password)](#CloudAPI+login) ⇒ <code>Promise</code>
     * [.logout()](#CloudAPI+logout) ⇒ <code>Promise</code>
     * [.self()](#CloudAPI+self) ⇒ <code>Promise</code>
     * [.devices()](#CloudAPI+devices) ⇒ <code>Promise</code>
     * [.delete_device(device_id)](#CloudAPI+delete_device) ⇒ <code>Promise</code>
+
+<a name="CloudAPI+debugging"></a>
+
+### cloudAPI.debugging(enabled) ⇒ <code>undefined</code>
+Enable or disable debugging
+
+**Kind**: instance method of <code>[CloudAPI](#CloudAPI)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| enabled | <code>boolean</code> | Enable or Disable debugging |
 
 <a name="CloudAPI+login"></a>
 

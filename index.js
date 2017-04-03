@@ -1,7 +1,7 @@
-let debug = require('debug')('UnifiAPI')
-let merge = require('merge')
-let UnifiRequest = require('./lib/unifi-request')
-let SSHSession = require('./lib/ssh-session')
+let debug = require('debug')('UnifiAPI');
+let merge = require('merge');
+let UnifiRequest = require('./lib/unifi-request');
+let SSHSession = require('./lib/ssh-session');
 
 let defaultOptions = {
     'username': 'unifi',
@@ -33,14 +33,25 @@ let defaultOptions = {
  * });
  */
 function UnifiAPI(options) {
-    if (!(this instanceof UnifiAPI)) return new UnifiAPI(options)
+    if (!(this instanceof UnifiAPI)) return new UnifiAPI(options);
     merge(this, defaultOptions, options);
-    if (this.debug) debug.enabled = true;
+    this.debugging(this.debug);
     if (typeof this.net === 'undefined') {
         this.net = new UnifiRequest(merge(true, defaultOptions, options));
     }
     debug('UnifiAPI Initialized with options %o', options);
 }
+
+/**
+ * Enable or disable the debug of the module
+ * @param {boolean} enable Enable or disable the debugging
+ * @returns {undefined}
+ */
+UnifiAPI.prototype.debugging = function(enable) {
+    this.debug = enable;
+    debug.enabled = this.debug ? true : false;
+    debug('Debug is', this.debug ? 'enabled' : 'disabled');
+};
 
 /**
  * Generic network operation, executing Ubiquiti command under /api/s/{site}/... rest api
@@ -49,7 +60,7 @@ function UnifiAPI(options) {
  * @param {object} headers optional. Default {}. HTTP headers that we require to be sent in the request
  * @param {object} method optional. Default undefined. The HTTP request method. If undefined, then it is automatic. If no jsonParams specified, it will be GET. If jsonParams are specified it will be POST
  * @param {string} site optional. The {site} atribute of the request. If not specified, it is taken from the UnifiAPI init options, where if it is not specified, it is "default"
- * @returns Promise
+ * @return {Promise}
  * @example unifi.netsite('/cmd/stamgr', { cmd: 'authorize-guest', mac: '00:01:02:03:04:05', minutes: 60 }, {}, 'POST', 'default')
  *     .then(data => console.log('Success', data))
  *     .catch(error => console.log('Error', error));
@@ -261,7 +272,7 @@ UnifiAPI.prototype.stat_sessions = function(start = undefined, end = undefined, 
  *     .then(done => console.log('Success',done))
  *     .catch(err => console.log('Error',err))
  */
-UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined, attrs = [ 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time' ], site = undefined) {
+UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined, attrs = ['bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time'], site = undefined) {
     return this.netsite('/stat/report/daily.site', {
         start: start ? start : (new Date()).getTime() - 52 * 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -280,7 +291,7 @@ UnifiAPI.prototype.stat_daily_site = function(start = undefined, end = undefined
  *     .then(done => console.log('Success',done))
  *     .catch(err => console.log('Error',err))
  */
-UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefined, attrs = [ 'bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time' ], site = undefined) {
+UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefined, attrs = ['bytes', 'wan-tx_bytes', 'wan-rx_bytes', 'wlan_bytes', 'num_sta', 'lan-num_sta', 'wlan-num_sta', 'time'], site = undefined) {
     return this.netsite('/stat/report/hourly.site', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -299,7 +310,7 @@ UnifiAPI.prototype.stat_hourly_site = function(start = undefined, end = undefine
  *     .then(done => console.log('Success',done))
  *     .catch(err => console.log('Error',err))
  */
-UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined, attrs = [ 'bytes', 'num_sta', 'time' ], site = undefined) {
+UnifiAPI.prototype.stat_hourly_ap = function(start = undefined, end = undefined, attrs = ['bytes', 'num_sta', 'time'], site = undefined) {
     return this.netsite('/stat/report/hourly.ap', {
         start: start ? start : (new Date()).getTime() - 7 * 24 * 3600 * 1000,
         end: end ? end : (new Date()).getTime(),
@@ -352,7 +363,7 @@ UnifiAPI.prototype.stat_auths = function(start = undefined, end = undefined, sit
  *     .then(done => console.log('Success',done))
  *     .catch(err => console.log('Error',err))
  */
-UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, type='all', conn='all', site = undefined) {
+UnifiAPI.prototype.stat_allusers = function(historyhours = 8670, type = 'all', conn = 'all', site = undefined) {
     return this.netsite('/stat/alluser', {
         type: type,
         conn: conn,
