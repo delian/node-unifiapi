@@ -31,6 +31,9 @@ A frequent error caused by node-webrtc module is the one defined in issue [#281]
 It happens mostly on Linux, almost exquisively if the Linux have X11 subsystem, although it is not caused directly by it (but a bad linking).
 The easiest method to avoid it is to use non desktop (non X11 based) Linux distribution, like Ubuntu Server. We all hope that in version 0.0.62 of the node-webrtc module this issue will be fixed.
 
+## Test from CLI
+There is a sister project available here [https://github.com/delian/unificli](https://github.com/delian/unificli) which provides CLI tool where all (or most) of the calls of this API are exposed as REPL CLI commands one could use to test.
+
 ## Usage
 
 All the API are Promises
