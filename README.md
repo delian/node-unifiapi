@@ -31,6 +31,29 @@ A frequent error caused by node-webrtc module is the one defined in issue [#281]
 It happens mostly on Linux, almost exquisively if the Linux have X11 subsystem, although it is not caused directly by it (but a bad linking).
 The easiest method to avoid it is to use non desktop (non X11 based) Linux distribution, like Ubuntu Server. We all hope that in version 0.0.62 of the node-webrtc module this issue will be fixed.
 
+### Segmentation errors
+Again, the node-wrtc module is quite unstable sometimes. I find it best working on OSX or Linux (Linux Server, without X11 libraries) with the
+prebuilt binary images (which for the moment requires node version 6.9 maximum for Linux).
+The problem with this instability seems to be well known to the wrtc community but I cannot predict when it will be fixed.
+
+However, the unifiapi module uses the standart webrtc api, so it could work with any webrtc module with the standard api.
+
+Following is an example with electron-webrtc module:
+
+   npm install electron-webrtc
+
+And then a test (example) code:
+
+    let cloud = require('node-unifiapi/cloudapi');
+    let wrtc = require('electron-webrtc')({ headless: true });
+
+    let r = cloud({ device-id: 'xxx-xxx-xx-xx-xx-xx', username: 'myuser', password: 'mypass', webrtc: wrtc, waiter: 1000 }).api;
+
+    r.stat_sessions().then(data => console.log('Success', data).catch(err => console.log('Error', err);
+
+
+The waiter property sets delay between every command sent to the webrtc in ms. I found electron-webrtc working better, if there is at least 500ms delay between the calls.
+
 ## Test from CLI
 There is a sister project available here [https://github.com/delian/unificli](https://github.com/delian/unificli) which provides CLI tool where all (or most) of the calls of this API are exposed as REPL CLI commands one could use to test.
 
