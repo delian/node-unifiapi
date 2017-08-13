@@ -186,6 +186,7 @@ let unifi = UnifiAPI({
     * [.list_guests(historyhours, site)](#UnifiAPI+list_guests) ⇒ <code>Promise</code>
     * [.list_guests2(historyhours, site)](#UnifiAPI+list_guests2) ⇒ <code>Promise</code>
     * [.list_clients(mac, site)](#UnifiAPI+list_clients) ⇒ <code>Promise</code>
+    * [.list_some_clients(macs, ap, site)](#UnifiAPI+list_some_clients) ⇒ <code>Promise</code>
     * [.stat_client(mac, site)](#UnifiAPI+stat_client) ⇒ <code>Promise</code>
     * [.list_usergroup(site)](#UnifiAPI+list_usergroup) ⇒ <code>Promise</code>
     * [.set_usergroup(userid, groupid, site)](#UnifiAPI+set_usergroup) ⇒ <code>Promise</code>
@@ -682,6 +683,26 @@ List of (all) clients per station
 **Example**  
 ```js
 unifi.list_clients()
+    .then(done => console.log('Success',done))
+    .catch(err => console.log('Error',err))
+```
+<a name="UnifiAPI+list_some_clients"></a>
+
+### unifiAPI.list_some_clients(macs, ap, site) ⇒ <code>Promise</code>
+List of group of clients per station
+
+**Kind**: instance method of <code>[UnifiAPI](#UnifiAPI)</code>  
+**Returns**: <code>Promise</code> - Promise  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| macs | <code>string</code> | String mac or array of mac addresses as strings, to get information about them |
+| ap | <code>string</code> | Station man address |
+| site | <code>string</code> | Ubiquiti site, if different from default - optional |
+
+**Example**  
+```js
+unifi.list_some_clients()
     .then(done => console.log('Success',done))
     .catch(err => console.log('Error',err))
 ```

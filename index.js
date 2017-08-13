@@ -413,6 +413,25 @@ UnifiAPI.prototype.list_clients = function(mac = '', site = undefined) {
 };
 
 /**
+ * List of group of clients per station
+ * @param {string} macs String mac or array of mac addresses as strings, to get information about them
+ * @param {string} ap Station man address
+ * @param {string} site Ubiquiti site, if different from default - optional
+ * @return {Promise} Promise
+ * @example unifi.list_some_clients()
+ *     .then(done => console.log('Success',done))
+ *     .catch(err => console.log('Error',err))
+ */
+UnifiAPI.prototype.list_some_clients = function(macs = undefined, ap = '', site = undefined) {
+    var clients = undefined;
+    if (macs) {
+        if (typeof macs == 'string') clients = { macs: [ macs ] }
+        else if (macs instanceof Array) clients = { macs: macs };
+    }
+    return this.netsite('/stat/sta/' + ap, clients, {}, undefined, site);
+};
+
+/**
  * Statistics of (all) clients per station
  * @param {string} mac Mac address
  * @param {string} site Ubiquiti site, if different from default - optional
