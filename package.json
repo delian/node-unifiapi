@@ -31,7 +31,7 @@
     "request": "^2.79.0",
     "request-debug": "^0.2.0",
     "uuid": "^3.0.1",
-    "wrtc": "0.0.61",
+    "wrtc": "0.0.65",
     "ws": "^2.0.1"
   },
   "jshintConfig": {
