@@ -21,7 +21,14 @@ To install run:
 
     npm install node-unifiapi --save
 
-The installation depends on the Node's wrtc module. Therefore the instalation requirements are the same as for the [node-webrtc](https://github.com/js-platform/node-webrtc). Please consult with the installation requirements of this module in order to be able to install node-unifiapi.
+The installation DOES NOT depend on the Node's wrtc module anymore.
+If you want to use the WebRTC functionality (Unifi cloudapi and SSH tunnels to device) you have to install webrtc module, and if this module is not node-webrtc you have to explicitly specify it according to the documentation.
+
+To install node-webrtc do:
+
+    npm install node-webrtc --save
+
+The install requirements for node-webrtc are visible here [node-webrtc](https://github.com/js-platform/node-webrtc). Please consult with the installation requirements of this module in order to be able to install it.
 
 ### XOpenDisplay Error
 A frequent error caused by node-webrtc module is the one defined in issue [#281](https://github.com/js-platform/node-webrtc/issues/281)
