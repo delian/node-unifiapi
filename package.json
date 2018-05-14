@@ -1,6 +1,6 @@
 {
   "name": "node-unifiapi",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "Provides API to manage Ubiquiti Unifi Controller, ver 4 and 5",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "debug": "^2.6.0",
     "merge": "^1.2.0",
     "paco": "^0.4.0",
+    "pako": "^1.0.6",
     "request": "^2.79.0",
     "request-debug": "^0.2.0",
     "uuid": "^3.0.1",
