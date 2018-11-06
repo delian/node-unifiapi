@@ -1,6 +1,6 @@
 {
   "name": "node-unifiapi",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "description": "Provides API to manage Ubiquiti Unifi Controller, ver 4 and 5",
   "main": "index.js",
   "scripts": {
@@ -22,17 +22,16 @@
   },
   "homepage": "https://github.com/delian/node-unifiapi#readme",
   "devDependencies": {
-    "jsdoc-to-markdown": "^3.0.0"
+    "jsdoc-to-markdown": "^3.0.4"
   },
   "dependencies": {
-    "debug": "^2.6.0",
-    "merge": "^1.2.0",
-    "paco": "^0.4.0",
+    "debug": "^2.6.9",
+    "merge": "^1.2.1",
     "pako": "^1.0.6",
-    "request": "^2.87.0",
+    "request": "^2.88.0",
     "request-debug": "^0.2.0",
-    "uuid": "^3.0.1",
-    "ws": "^2.0.1"
+    "uuid": "^3.3.2",
+    "ws": "^6.1.0"
   },
   "jshintConfig": {
     "esversion": 6
