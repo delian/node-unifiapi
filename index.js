@@ -150,7 +150,7 @@ UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
  */
 UnifiAPI.prototype.kick_sta = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
-        cmd: 'kick_sta',
+        cmd: 'kick-sta',
         mac: mac.toLowerCase()
     }, {}, undefined, site);
 };
