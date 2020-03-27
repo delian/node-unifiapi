@@ -134,7 +134,7 @@ UnifiAPI.prototype.authorize_guest = function(mac = '', minutes = 60, up = undef
  */
 UnifiAPI.prototype.unauthorize_guest = function(mac = '', site = undefined) {
     return this.netsite('/cmd/stamgr', {
-        cmd: 'uauthorize-guest',
+        cmd: 'unauthorize-guest',
         mac: mac.toLowerCase()
     }, {}, undefined, site);
 };
