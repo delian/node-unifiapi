@@ -1,44 +1,49 @@
 {
-    "name": "node-unifiapi",
-    "version": "0.0.54",
-    "description": "Provides API to manage Ubiquiti Unifi Controller, ver 4 and 5",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc",
-        "readme": "jsdoc2md --template README.hbs --files index.js cloudapi.js > README.md"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/delian/node-unifiapi.git"
-    },
-    "keywords": [
-        "unifi",
-        "ubiquiti"
-    ],
-    "author": "Delian Delchev",
-    "license": "GPL-2.0",
-    "bugs": {
-        "url": "https://github.com/delian/node-unifiapi/issues"
-    },
-    "homepage": "https://github.com/delian/node-unifiapi#readme",
-    "devDependencies": {
-        "jsdoc-to-markdown": "^3.0.4",
-        "typescript": "^3.9.7"
-    },
-    "dependencies": {
-        "debug": "^2.6.9",
-        "merge": "^1.2.1",
-        "pako": "^1.0.11",
-        "request": "^2.88.2",
-        "request-debug": "^0.2.0",
-        "uuid": "^3.4.0",
-        "ws": "^6.2.1"
-    },
-    "jshintConfig": {
-        "esversion": 6
-    },
-    "engines": {
-        "node": ">=4.1.0"
-    }
+  "name": "node-unifiapi",
+  "version": "0.0.54",
+  "description": "Provides API to manage Ubiquiti Unifi Controller, ver 4 and 5",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "readme": "jsdoc2md --template README.hbs --files index.js cloudapi.js > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delian/node-unifiapi.git"
+  },
+  "keywords": [
+    "unifi",
+    "ubiquiti"
+  ],
+  "author": "Delian Delchev",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/delian/node-unifiapi/issues"
+  },
+  "homepage": "https://github.com/delian/node-unifiapi#readme",
+  "devDependencies": {
+    "jsdoc-to-markdown": "^3.0.4",
+    "prettier": "^2.0.5",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "debug": "^2.6.9",
+    "merge": "^1.2.1",
+    "pako": "^1.0.11",
+    "request": "^2.88.2",
+    "request-debug": "^0.2.0",
+    "uuid": "^3.4.0",
+    "ws": "^6.2.1"
+  },
+  "jshintConfig": {
+    "esversion": 6
+  },
+  "engines": {
+    "node": ">=4.1.0"
+  }
 }
