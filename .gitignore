@@ -45,3 +45,5 @@ tests/
 images/
 
 package-lock.json
+
+dist/
