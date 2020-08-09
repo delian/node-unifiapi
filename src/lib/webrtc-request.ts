@@ -3,23 +3,7 @@
 import { debug } from 'debug';
 import * as pako from 'pako';
 import { wait } from './wait';
-
-interface WrtcOptions {
-    waiter: number;
-    webrtc?: any;
-    messageId: number;
-    debugName?: string;
-    debug?: boolean;
-}
-
-interface OpenApiChannelIntf {
-    id: number;
-    totalLen: number;
-    reqLen: number;
-    requestStr: string;
-    request: any;
-    data: Uint8Array | string | Blob;
-}
+import { WrtcOptions, OpenApiChannelIntf } from './interfaces';
 
 const defaultOptions: WrtcOptions = {
     waiter: 10,
@@ -163,7 +147,7 @@ export class WRTC {
         });
     }
 
-    setRemoteDescription(desc: string): Promise<any> {
+    setRemoteDescription(desc: any): Promise<any> {
         return new Promise((resolve, reject) => {
             if (!this.options.webrtc) {
                 console.log(

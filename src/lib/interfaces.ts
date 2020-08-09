@@ -18,3 +18,20 @@ export interface DefaultOptionsIntf {
     net?: UnifiRequest;
     request?: any;
 }
+
+export interface WrtcOptions {
+    waiter?: number;
+    webrtc?: any;
+    messageId?: number;
+    debugName?: string;
+    debug?: boolean;
+}
+
+export interface OpenApiChannelIntf {
+    id: number;
+    totalLen: number;
+    reqLen: number;
+    requestStr: string;
+    request: any;
+    data: Uint8Array | string | Blob;
+}
