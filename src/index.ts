@@ -4,19 +4,7 @@ const debug = require('debug')('UnifiAPI');
 const UnifiRequest = require('./lib/unifi-request');
 const SSHSession = require('./lib/ssh-session');
 
-interface DefaultOptionsIntf {
-    username: string;
-    password: string;
-    baseUrl: string;
-    debug: boolean;
-    debugNet: boolean;
-    gzip: boolean;
-    site: string;
-    wrtc?: any;
-    webrtc?: any;
-    waiter?: any;
-    net?: UnifiRequest;
-}
+import { DefaultOptionsIntf } from './lib/interfaces';
 
 const defaultOptions: DefaultOptionsIntf = {
     username: 'unifi',
