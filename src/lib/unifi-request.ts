@@ -73,8 +73,8 @@ export class UnifiRequest {
                 (err, resp, body) => {
                     if (err) return reject(err); // resp
                     if (resp.statusCode < 200 || resp.statusCode > 299)
-                        return reject(body); // resp
-                    return resolve(body); // resp
+                        return reject({ data: body, resp }); // resp
+                    return resolve({ data: body, resp }); // resp
                 }
             );
         });
@@ -150,7 +150,7 @@ export class UnifiRequest {
             else method = 'POST';
         }
         return new Promise((resolve, reject) => {
-            let procFunc = (data: string | any, resp: string): void => {
+            let procFunc = ({ data, resp }): void => {
                 if (typeof data === 'string' && data.charAt(0) === '{')
                     data = JSON.parse(data);
                 if (
@@ -161,23 +161,21 @@ export class UnifiRequest {
                     resolve(data);
                     return;
                 } // data,resp
-                reject(data); // data,resp
+                reject({ data, resp }); // data,resp
             };
             this.login()
                 .then(() => {
                     this._request(url, jsonParams, headers, method, baseUrl)
                         .then(procFunc)
-                        .catch((error) => {
+                        .catch(({ data, resp }) => {
                             if (
-                                (resp && resp.statusCode == 401) ||
-                                (typeof error == 'string' &&
-                                    error.match('api.err.LoginRequired'))
+                                (resp && resp.statusCode === 401) ||
+                                (typeof data === 'string' &&
+                                    data.match('api.err.LoginRequired'))
                             ) {
                                 // We have problem with the Login for some reason
                                 debug(
-                                    'We have to reauthenticate again',
-                                    error,
-                                    resp
+                                    `We have to reauthenticate again ${data} ${resp}`
                                 );
                                 this.loggedIn = false; // Reset the login and repeat once more
                                 this.login()
@@ -192,7 +190,7 @@ export class UnifiRequest {
                                     )
                                     .then(procFunc)
                                     .catch(reject);
-                            } else reject(error, resp);
+                            } else reject(data);
                         });
                 })
                 .catch(reject);
