@@ -26,11 +26,11 @@
   },
   "dependencies": {
     "debug": "^2.6.9",
-    "merge": "^1.2.1",
+    "merge": "^2.1.1",
     "pako": "^1.0.6",
     "request": "^2.88.0",
     "request-debug": "^0.2.0",
-    "uuid": "^3.3.2",
+    "uuid": "^14.0.0",
     "ws": "^6.1.0"
   },
   "jshintConfig": {
